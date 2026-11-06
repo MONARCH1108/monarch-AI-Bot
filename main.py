@@ -4,6 +4,7 @@ from pydantic import BaseModel
 from LLM.groq_connection import get_available_models
 from auth.signup import signup
 from auth.login import login
+from chat.chat_service import chat_service
 
 app = FastAPI()
 
@@ -13,6 +14,12 @@ class SignupRequest(BaseModel):
 class LoginRequest(BaseModel):
     username: str
     user_uuid: str
+
+class ChatRequest(BaseModel):
+    user_uuid: str
+    model: str
+    message: str
+    chat_id: str | None = None
 
 @app.get("/models")
 def available_models():
@@ -43,6 +50,21 @@ def user_login(request: LoginRequest):
     if not response["success"]:
         raise HTTPException(
             status_code=401,
+            detail=response["error"]
+        )
+    return response
+
+@app.post("/chat")
+def user_chat(request: ChatRequest):
+    response = chat_service(
+        user_uuid=request.user_uuid,
+        model=request.model,
+        message=request.message,
+        chat_id=request.chat_id
+    )
+    if not response["success"]:
+        raise HTTPException(
+            status_code=400,
             detail=response["error"]
         )
     return response

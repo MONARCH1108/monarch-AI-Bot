@@ -6,13 +6,14 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-def groq_chat(model: str, message: str):
+def groq_chat(model: str, message: str, history: list = None):
     """
-    Generate an LLM response using Groq.
+    Generate an LLM response using Groq with optional conversation history.
 
     Args:
         model: Groq model ID.
-        message: User's input message.
+        message: User's latest input message.
+        history: Previous question-answer pairs.
 
     Returns:
         JSON-compatible response dictionary.
@@ -23,19 +24,41 @@ def groq_chat(model: str, message: str):
             raise ValueError("GROQ_API_KEY is not configured")
         if not model or not message:
             raise ValueError("Model and message are required")
+        if history is None:
+            history = []
+        if not isinstance(history, list):
+            raise ValueError("History must be a list")
+        messages = [
+            {
+                "role": "system",
+                "content": SYSTEM_PROMPT
+            }
+        ]
+        for item in history:
+            if not isinstance(item, dict):
+                raise ValueError("Each history item must be a dictionary")
+            question = item.get("question")
+            answer = item.get("answer")
+            if not isinstance(question, str) or not isinstance(answer, str):
+                raise ValueError("Each history item must contain a valid question and answer")
+            messages.extend([
+                {
+                    "role": "user",
+                    "content": question
+                },
+                {
+                    "role": "assistant",
+                    "content": answer
+                }
+            ])
+        messages.append({
+            "role": "user",
+            "content": message
+        })
         client = Groq(api_key=api_key)
         response = client.chat.completions.create(
             model=model,
-            messages=[
-                {
-                    "role": "system",
-                    "content": SYSTEM_PROMPT
-                },
-                {
-                    "role": "user",
-                    "content": message
-                }
-            ]
+            messages=messages
         )
         return {
             "success": True,
@@ -78,13 +101,22 @@ def groq_chat(model: str, message: str):
             "error": "An unexpected error occurred during chat completion."
         }
 
-
 if __name__ == "__main__":
-
+    import json
+    test_history = [
+        {
+            "question": "What is Python?",
+            "answer": "Python is a high-level programming language."
+        },
+        {
+            "question": "Where is it used?",
+            "answer": "Python is used in AI, automation, web development and data science."
+        }
+    ]
     result = groq_chat(
         model="openai/gpt-oss-20b",
-        message="What is artificial intelligence? in 2lines"
+        message="How is it used in AI?",
+        history=test_history
     )
 
-    import json
     print(json.dumps(result, indent=4))
