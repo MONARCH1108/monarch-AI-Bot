@@ -1,6 +1,14 @@
-def main():
-    print("Hello from monarch-ai-bot!")
+from fastapi import FastAPI, HTTPException
+from LLM.groq_connection import get_available_models
 
+app = FastAPI()
 
-if __name__ == "__main__":
-    main()
+@app.get("/models")
+def available_models():
+    response = get_available_models()
+    if not response["success"]:
+        raise HTTPException(
+            status_code=500,
+            detail=response["error"]
+        )
+    return response
