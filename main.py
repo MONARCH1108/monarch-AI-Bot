@@ -5,6 +5,8 @@ from LLM.groq_connection import get_available_models
 from auth.signup import signup
 from auth.login import login
 from chat.chat_service import chat_service
+from chat_Management.chat_history import chat_history
+from chat_Management.get_all_chats import get_all_chats
 
 app = FastAPI()
 
@@ -20,6 +22,13 @@ class ChatRequest(BaseModel):
     model: str
     message: str
     chat_id: str | None = None
+
+class ChatHistoryRequest(BaseModel):
+    user_uuid: str
+    chat_id: str
+
+class AllChatsRequest(BaseModel):
+    user_uuid: str
 
 @app.get("/models")
 def available_models():
@@ -67,4 +76,31 @@ def user_chat(request: ChatRequest):
             status_code=400,
             detail=response["error"]
         )
+    return response
+
+@app.post("/chat/history")
+def user_chat_history(request: ChatHistoryRequest):
+    response = chat_history(
+        user_uuid=request.user_uuid,
+        chat_id=request.chat_id
+    )
+    if not response["success"]:
+        raise HTTPException(
+            status_code=400,
+            detail=response["error"]
+        )
+    return response
+
+@app.post("/chats")
+def user_all_chats(request: AllChatsRequest):
+    response = get_all_chats(
+        user_uuid=request.user_uuid
+    )
+
+    if not response["success"]:
+        raise HTTPException(
+            status_code=400,
+            detail=response["error"]
+        )
+
     return response
