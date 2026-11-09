@@ -6,17 +6,28 @@
 
 | Field | Details |
 |---|---|
-| **Project Name** | Monarch AI Bot |
-| **Project Purpose** | A backend REST API chatbot that allows guest users to sign up, log in (within a 24-hour window), and interact with LLM models through the Groq API. Conversations and messages are persisted in a PostgreSQL database. |
-| **Main Technologies** | Python 3.14, FastAPI, Groq SDK, PostgreSQL (Neon), psycopg 3, Pydantic, uvicorn, python-dotenv |
-| **High-Level Architecture** | Backend-only REST API. FastAPI serves HTTP endpoints; business logic is organized into `auth/`, `chat/`, `chat_Management/`, and `LLM/` modules. Data is persisted in a Neon PostgreSQL database. LLM completions are generated via the Groq cloud API. No frontend exists in this repository. |
+| **Project Name** | Monarch AI Bot (Server) |
+| **Project Purpose** | A containerized, production-ready backend REST API chatbot deployed on Render. Features dual-layer authentication (HTTP Basic Auth issuing single-active JWT tokens alongside guest user 24-hour expiration), persistent conversations and messages in PostgreSQL (Neon), and LLM completions via Groq API. |
+| **Main Technologies** | Python 3.14, FastAPI, Uvicorn, Groq SDK, PostgreSQL (Neon), psycopg 3, PyJWT, Pydantic, python-dotenv, uv, Docker, Render |
+| **High-Level Architecture** | Dockerized backend REST API hosted on Render. Inbound requests to protected endpoints require Bearer JWT authentication verified against an active database token record (`api_active_token`). In addition, end-user guest accounts are managed with 24-hour validity windows. Business logic is organized into `APIAuth/`, `auth/`, `chat/`, `chat_Management/`, and `LLM/` modules. Data persistence is managed via Neon PostgreSQL, and AI inference is powered by Groq. |
 
 ---
 
 ## B. Complete Directory Structure
 
 ```
-monarch-AI-Bot/
+server/
+├── APIAuth/
+│   ├── basic_auth.py
+│   │   └── verify_basic_auth() — Verifies HTTP Basic Auth credentials against configured environment variables using secure constant-time comparison.
+│   ├── generate_jwt.py
+│   │   └── generate_jwt() — Generates a signed HS256 JWT access token containing a unique UUID identifier (jti) and issue timestamp.
+│   ├── token_database.py
+│   │   ├── store_active_token() — Inserts or updates the single active JWT identifier in the api_active_token database table.
+│   │   └── verify_active_token() — Checks whether a supplied JWT identifier matches the active token record in the database.
+│   └── verify_jwt.py
+│       └── verify_jwt() — Decodes and verifies the signature, algorithm, payload, and active database status of a JWT access token.
+│
 ├── auth/
 │   ├── database.py
 │   │   └── get_db_connection() — Establishes and returns a connection to Neon PostgreSQL using DATABASE_URL.
@@ -54,15 +65,22 @@ monarch-AI-Bot/
 │   │   └── get_available_models() — Fetches all active models from the Groq API and returns their metadata.
 │   └── prompt.py
 │
+├── .dockerignore
+├── .env
 ├── .gitignore
 ├── .python-version
+├── Dockerfile
 ├── main.py
-│   ├── available_models() — GET /models handler; retrieves all available Groq LLM models.
-│   ├── user_signup() — POST /signup handler; registers a new guest user.
-│   ├── user_login() — POST /login handler; authenticates a user with username and UUID.
-│   ├── user_chat() — POST /chat handler; sends a message and returns the LLM response.
-│   ├── user_chat_history() — POST /chat/history handler; retrieves message history for a conversation.
-│   └── user_all_chats() — POST /chats handler; retrieves all conversations for a user.
+│   ├── health_check() — GET /health handler; reports server operational status.
+│   ├── require_basic_auth() — FastAPI dependency; extracts and validates HTTP Basic Auth credentials.
+│   ├── require_jwt() — FastAPI dependency; extracts, validates, and checks active database status of Bearer JWT credentials.
+│   ├── create_access_token() — POST /token handler; authenticates via Basic Auth and generates a new active JWT access token.
+│   ├── available_models() — GET /models handler; retrieves all available Groq LLM models (requires JWT).
+│   ├── user_signup() — POST /signup handler; registers a new guest user (requires JWT).
+│   ├── user_login() — POST /login handler; authenticates a user with username and UUID (requires JWT).
+│   ├── user_chat() — POST /chat handler; sends a message and returns the LLM response (requires JWT).
+│   ├── user_chat_history() — POST /chat/history handler; retrieves message history for a conversation (requires JWT).
+│   └── user_all_chats() — POST /chats handler; retrieves all conversations for a user (requires JWT).
 ├── pyproject.toml
 ├── README.md
 └── uv.lock
@@ -76,131 +94,146 @@ monarch-AI-Bot/
 
 | Package | Version | Purpose |
 |---|---|---|
-| `fastapi` | ≥ 0.162.0 | Web framework for building the REST API |
-| `uvicorn` | ≥ 0.54.0 | ASGI server to run the FastAPI application |
-| `groq` | ≥ 1.7.0 | Official Groq SDK for LLM chat completions and model listing |
-| `psycopg[binary]` | ≥ 3.3.8 | PostgreSQL adapter (psycopg 3) for database connectivity |
+| `fastapi` | ≥ 0.162.0 | High-performance web framework for building the REST API, dependencies, and OpenAPI documentation |
+| `uvicorn` | ≥ 0.54.0 | ASGI web server used to run the FastAPI application |
+| `groq` | ≥ 1.7.0 | Official Groq SDK for LLM chat completions and dynamic model catalog discovery |
+| `psycopg[binary]` | ≥ 3.3.8 | PostgreSQL database adapter (psycopg 3) for relational data persistence |
+| `pyjwt` | ≥ 2.15.1 | JSON Web Token encoding, decoding, signature verification, and payload claims validation |
 | `dotenv` | ≥ 0.9.9 | Loads environment variables from `.env` file |
-| `pydantic` | (bundled with FastAPI) | Request body validation and serialization |
+| `pydantic` | (bundled with FastAPI) | Request validation, payload schema definition, and serialization |
 
 ### Database
 
 | Service | Purpose |
 |---|---|
-| Neon PostgreSQL | Cloud-hosted PostgreSQL database for user, conversation, and message persistence |
+| Neon PostgreSQL | Serverless cloud-hosted PostgreSQL database for storing user accounts, active JWT metadata, conversations, and message history |
 
 ### External Services and APIs
 
 | Service | Purpose |
 |---|---|
-| Groq API | Cloud LLM inference provider — used for chat completions and model listing |
+| Groq API | High-throughput cloud LLM inference platform for model catalog queries and chat completions |
+| Render | Cloud platform hosting the containerized Docker web service with automatic deployment and TLS termination |
 
-### Development Tools
+### Development and Deployment Tools
 
 | Tool | Purpose |
 |---|---|
-| `uv` | Python package and project manager (generates `uv.lock`) |
+| `uv` | Fast Python package and project manager; manages dependencies and generates `uv.lock` |
+| `Docker` | Multi-stage slim container packaging (`python:3.14-slim`) running Uvicorn on port 8000 |
 
 ### Frontend Dependencies
 
-No frontend exists in this repository. There are no frontend dependencies.
-
-### Development and Testing Dependencies
-
-No dedicated testing framework or development-only dependencies are declared in `pyproject.toml`.
+No frontend application is present in this repository. There are no frontend dependencies.
 
 ---
 
 ## F. Database Structure
 
-The database schema is inferred from SQL queries in the codebase. The database is hosted on **Neon PostgreSQL**.
+The database schema is inferred from SQL queries executed across the codebase on **Neon PostgreSQL**.
+
+### Table: `api_active_token`
+
+Maintains the single currently active JWT identifier for API access. When a new token is generated, the record with `id = 1` is updated, immediately revoking previous tokens.
+
+| Column | Data Type (inferred) | Constraints | Description |
+|---|---|---|---|
+| `id` | `INTEGER` | Primary Key, Default `1` | Singleton row identifier ensuring only one active token exists globally. |
+| `jti` | `UUID` | Not Null | Unique identifier of the currently authorized JWT access token. |
+| `created_at` | `TIMESTAMP` | Not Null, Default `NOW()` | Timestamp when the active token was generated or replaced. |
 
 ### Table: `users`
+
+Stores end-user guest accounts and enforces the 24-hour expiration window.
 
 | Column | Data Type (inferred) | Constraints | Description |
 |---|---|---|---|
 | `user_uuid` | `UUID` | Primary Key | Unique identifier for the user, generated server-side via `uuid.uuid4()`. |
-| `username` | `VARCHAR(50)` | Unique (`users_username_key`), Not Null | User-chosen display name. Case-sensitive. |
-| `created_at` | `TIMESTAMP` | Not Null, Default `NOW()` | Timestamp of account creation. Used to enforce the 24-hour validity window. |
+| `username` | `VARCHAR(50)` | Unique (`users_username_key`), Not Null | Case-sensitive user-chosen display name. |
+| `created_at` | `TIMESTAMP` | Not Null, Default `NOW()` | Account creation timestamp used to evaluate the 24-hour validity condition. |
 
 ### Table: `conversations`
+
+Stores conversation threads associated with a guest user.
 
 | Column | Data Type (inferred) | Constraints | Description |
 |---|---|---|---|
 | `chat_id` | `UUID` | Primary Key, Default generated | Unique conversation identifier. |
 | `user_uuid` | `UUID` | Foreign Key → `users.user_uuid`, Not Null | Owner of the conversation. |
-| `title` | `VARCHAR` / `TEXT` | Nullable | Conversation title (returned as-is; no title generation logic is implemented). |
+| `title` | `VARCHAR` / `TEXT` | Nullable | Conversation title (reserved for future title generation). |
 | `created_at` | `TIMESTAMP` | Not Null, Default `NOW()` | Timestamp of conversation creation. |
-| `updated_at` | `TIMESTAMP` | Not Null, Default `NOW()` | Timestamp of last activity. Updated on each `save_message` call. |
+| `updated_at` | `TIMESTAMP` | Not Null, Default `NOW()` | Timestamp of latest conversation activity. Updated on every `save_message` call. |
 
 ### Table: `messages`
 
+Stores individual question-answer exchanges within conversations.
+
 | Column | Data Type (inferred) | Constraints | Description |
 |---|---|---|---|
-| `message_id` | `UUID` | Primary Key, Default generated | Unique message identifier. |
-| `user_uuid` | `UUID` | Foreign Key → `users.user_uuid`, Not Null | User who sent the message. |
-| `chat_id` | `UUID` | Foreign Key → `conversations.chat_id`, Not Null | Conversation this message belongs to. |
-| `question` | `TEXT` | Not Null | The user's input message. |
-| `answer` | `TEXT` | Not Null | The LLM-generated response. |
-| `model` | `VARCHAR` / `TEXT` | Not Null | The LLM model ID that generated the answer. |
-| `created_at` | `TIMESTAMP` | Not Null, Default `NOW()` | Timestamp of message creation. |
+| `message_id` | `UUID` | Primary Key, Default generated | Unique message exchange identifier. |
+| `user_uuid` | `UUID` | Foreign Key → `users.user_uuid`, Not Null | User who submitted the message. |
+| `chat_id` | `UUID` | Foreign Key → `conversations.chat_id`, Not Null | Conversation to which this exchange belongs. |
+| `question` | `TEXT` | Not Null | User prompt/query submitted to the LLM. |
+| `answer` | `TEXT` | Not Null | Response content generated by the LLM. |
+| `model` | `VARCHAR` / `TEXT` | Not Null | Groq model identifier used to generate the answer. |
+| `created_at` | `TIMESTAMP` | Not Null, Default `NOW()` | Timestamp when the message exchange occurred. |
 
-### Relationships
+### Relational Schema
 
 ```
-users.user_uuid  ──<  conversations.user_uuid
-users.user_uuid  ──<  messages.user_uuid
-conversations.chat_id  ──<  messages.chat_id
+api_active_token (singleton active token record)
+
+users.user_uuid ──< conversations.user_uuid
+users.user_uuid ──< messages.user_uuid
+conversations.chat_id ──< messages.chat_id
 ```
 
-### Unique Constraints
+### Database Models and Source Locations
 
-- `users_username_key` — enforces uniqueness on `users.username` (referenced in signup error handling).
-
-### Database Models and Files
-
-There are no ORM model classes. Database interactions are performed via raw SQL queries using `psycopg` in the following files:
-- `auth/database.py` — connection factory
-- `auth/signup.py` — inserts into `users`
-- `auth/login.py` — selects from `users`
-- `chat/chat_service.py` — selects from `users` and `conversations`
-- `chat/create_chat.py` — inserts into `conversations`
-- `chat/get_history.py` — selects from `messages`
-- `chat/save_message.py` — inserts into `messages`, updates `conversations`
-- `chat_Management/get_all_chats.py` — selects from `conversations`
+No ORM is used; all operations execute raw parameterized SQL via `psycopg`:
+- `APIAuth/token_database.py` — manages upsert and lookup in `api_active_token`
+- `auth/database.py` — connection factory (`get_db_connection`)
+- `auth/signup.py` — inserts new records into `users`
+- `auth/login.py` — selects and validates records in `users`
+- `chat/chat_service.py` — validates ownership and validity in `users` and `conversations`
+- `chat/create_chat.py` — inserts new records into `conversations`
+- `chat/get_history.py` — selects chronological messages from `messages`
+- `chat/save_message.py` — inserts new records into `messages` and updates `conversations.updated_at`
+- `chat_Management/get_all_chats.py` — selects user threads from `conversations`
 
 ### Migrations
 
-No migration files or migration framework was found in the repository.
+No migration scripts exist in the repository; tables are provisioned directly in PostgreSQL.
 
 ---
 
 ## G. API Inventory
 
-| Method | Endpoint | File | Function | Purpose |
-|---|---|---|---|---|
-| `GET` | `/models` | `main.py` | `available_models` | Retrieve all available Groq LLM models and their metadata. |
-| `POST` | `/signup` | `main.py` | `user_signup` | Register a new guest user with a username. Returns user UUID. |
-| `POST` | `/login` | `main.py` | `user_login` | Authenticate a user with username + UUID. Enforces 24-hour validity. |
-| `POST` | `/chat` | `main.py` | `user_chat` | Send a message and receive an LLM response. Creates a new conversation if `chat_id` is not provided. |
-| `POST` | `/chat/history` | `main.py` | `user_chat_history` | Retrieve full message history for a specific conversation. |
-| `POST` | `/chats` | `main.py` | `user_all_chats` | Retrieve all conversations belonging to a user. |
+| Method | Endpoint | File | Function | Auth Requirement | Purpose |
+|---|---|---|---|---|---|
+| `GET` | `/health` | `main.py` | `health_check` | None | Public health check verifying the server is operational. |
+| `POST` | `/token` | `main.py` | `create_access_token` | HTTP Basic Auth (`API_AUTH_USERNAME`, `API_AUTH_PASSWORD`) | Issues a new HS256 JWT access token and registers its `jti` in `api_active_token`. |
+| `GET` | `/models` | `main.py` | `available_models` | HTTP Bearer JWT | Retrieves all active Groq LLM models and their metadata. |
+| `POST` | `/signup` | `main.py` | `user_signup` | HTTP Bearer JWT | Registers a new guest user with a unique username; returns user UUID. |
+| `POST` | `/login` | `main.py` | `user_login` | HTTP Bearer JWT | Authenticates a guest user with username + UUID within the 24-hour period. |
+| `POST` | `/chat` | `main.py` | `user_chat` | HTTP Bearer JWT | Sends a user message, calls Groq LLM, stores question/answer, and returns the response. |
+| `POST` | `/chat/history` | `main.py` | `user_chat_history` | HTTP Bearer JWT | Retrieves full chronological message history for a conversation. |
+| `POST` | `/chats` | `main.py` | `user_all_chats` | HTTP Bearer JWT | Retrieves all conversation threads belonging to a user. |
 
-### Authentication
+### Authentication Scheme Details
 
-There is no token-based or session-based authentication middleware. User identity is verified per-request by matching `user_uuid` (and `username` for login) against database records. The 24-hour account expiration is checked in `login` and `chat_service`.
-
-### Request/Response Details
-
-All endpoints accept and return `application/json`. Request bodies are validated using Pydantic models defined in `main.py`:
-
-| Pydantic Model | Fields | Used By |
-|---|---|---|
-| `SignupRequest` | `username: str` | `POST /signup` |
-| `LoginRequest` | `username: str`, `user_uuid: str` | `POST /login` |
-| `ChatRequest` | `user_uuid: str`, `model: str`, `message: str`, `chat_id: str \| None` | `POST /chat` |
-| `ChatHistoryRequest` | `user_uuid: str`, `chat_id: str` | `POST /chat/history` |
-| `AllChatsRequest` | `user_uuid: str` | `POST /chats` |
+1. **HTTP Basic Auth (`POST /token`):**
+   - Header: `Authorization: Basic <base64(username:password)>`
+   - Validated against `API_AUTH_USERNAME` and `API_AUTH_PASSWORD` via `hmac.compare_digest`.
+   - On success, generates a signed JWT and writes `jti` to `api_active_token (id=1)`.
+2. **HTTP Bearer JWT (Protected Endpoints):**
+   - Header: `Authorization: Bearer <token>`
+   - Validates cryptographic signature using `JWT_SECRET` (HS256).
+   - Validates required claims `jti` and `iat`.
+   - Verifies `jti` against `api_active_token` in the database to guarantee the token has not been superseded.
+3. **End-User Guest Authorization (Application Layer):**
+   - Validates `user_uuid` existence in the `users` table.
+   - Enforces `created_at > NOW() - INTERVAL '24 hours'`.
 
 ---
 
@@ -208,9 +241,11 @@ All endpoints accept and return `application/json`. Request bodies are validated
 
 | Variable | Purpose | Used By | Required |
 |---|---|---|---|
-| `DATABASE_URL` | PostgreSQL connection string for Neon database | `auth/database.py` | **Yes** |
-| `GROQ_API_KEY` | API key for authenticating with the Groq cloud API | `LLM/groq_connection.py`, `LLM/groq_chat.py` | **Yes** |
+| `DATABASE_URL` | PostgreSQL connection URI for Neon database | `auth/database.py` | **Yes** |
+| `GROQ_API_KEY` | API key for Groq cloud LLM platform | `LLM/groq_connection.py`, `LLM/groq_chat.py` | **Yes** |
+| `API_AUTH_USERNAME` | Username required for HTTP Basic Auth to issue JWT tokens | `APIAuth/basic_auth.py` | **Yes** |
+| `API_AUTH_PASSWORD` | Password required for HTTP Basic Auth to issue JWT tokens | `APIAuth/basic_auth.py` | **Yes** |
+| `JWT_SECRET` | Cryptographic secret key (minimum 32 bytes) for HS256 JWT signing and verification | `APIAuth/generate_jwt.py`, `APIAuth/verify_jwt.py` | **Yes** |
+| `JWT_ALGORITHM` | JWT signing algorithm (defaults to `HS256`) | `APIAuth/generate_jwt.py`, `APIAuth/verify_jwt.py` | Optional (default: `HS256`) |
 
-Both variables are loaded from a `.env` file using `python-dotenv`. The `.env` file is excluded from version control via `.gitignore`.
-
-No actual secret values, API keys, or credentials are exposed in this documentation.
+> **Security Note:** Environment variables are loaded via `dotenv` locally and supplied via Render Environment Settings in production. No secret values are hardcoded in the repository.
