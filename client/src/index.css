@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:wght@400;500;600;700&display=swap');
+
 
 /* =========================================
    GLOBAL RESET
@@ -250,7 +252,6 @@ img {
    BLOCK 3 — GLOBAL TYPOGRAPHY
 ========================================= */
 
-@import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:wght@400;500;600;700&display=swap');
 
 * {
     font-family: 'Bodoni Moda', serif;

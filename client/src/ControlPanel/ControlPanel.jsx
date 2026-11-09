@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Layout, Button, Tooltip } from "antd";
 
@@ -11,11 +12,13 @@ import {
     ClockCircleOutlined
 } from "@ant-design/icons";
 
+import Account from "./Account/Account";
+
 import "./ControlPanel.css";
 
 const { Sider } = Layout;
 
-function ControlPanel({ user = null }) {
+function ControlPanel({ user = null, onAuthenticated }) {
     const [collapsed, setCollapsed] = useState(false);
     const [activeTab, setActiveTab] = useState("Settings");
 
@@ -143,19 +146,9 @@ function ControlPanel({ user = null }) {
                                     <span>Account</span>
                                 </div>
 
-                                <div className="account-placeholder">
-                                    <UserOutlined className="account-placeholder-icon" />
-
-                                    <h3>Welcome to Monarch</h3>
-
-                                    <p>
-                                        Sign up or log in to access your
-                                        personal AI workspace.
-                                    </p>
-
-                                    {/* Sign Up and Login will be added here */}
-
-                                </div>
+                                <Account
+                                    onAuthenticated={onAuthenticated}
+                                />
 
                             </div>
                         )}
