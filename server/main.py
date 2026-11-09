@@ -38,6 +38,15 @@ class ChatHistoryRequest(BaseModel):
 class AllChatsRequest(BaseModel):
     user_uuid: str
 
+# Health Check API
+@app.get("/health")
+def health_check():
+    return {
+        "success": True,
+        "status": "healthy",
+        "message": "Monarch AI Bot server is running."
+    }
+
 # Basic Auth Dependency
 def require_basic_auth(
     credentials: HTTPBasicCredentials = Depends(basic_security)
