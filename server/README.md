@@ -221,6 +221,7 @@ Detailed technical documentation is available in the `Documents/` directory:
 
 ---
 
-## License
+## Docker Build and Run Cmds
+docker build -t monarch-ai-bot:latest .
 
-No license file is currently included in the repository.
+docker run --env-file .env -p 8000:8000 monarch-ai-bot:latest
