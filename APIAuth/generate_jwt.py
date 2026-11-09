@@ -44,7 +44,8 @@ def generate_jwt():
             "success": True,
             "message": "JWT generated successfully.",
             "token": token,
-            "token_type": "Bearer"
+            "token_type": "Bearer",
+            "jti": payload["jti"]
         }
     except ValueError as e:
         return {

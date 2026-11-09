@@ -7,15 +7,13 @@ from jwt.exceptions import (
     InvalidTokenError,
     PyJWTError
 )
+from APIAuth.token_database import verify_active_token
 
 load_dotenv()
 
 def verify_jwt(token: str):
     """
-    Verify a JWT's signature and validity.
-
-    No expiration check is required because generated tokens
-    intentionally do not contain an exp claim.
+    Verify JWT signature, validity and active token status.
     """
     try:
         # Validate token input
@@ -30,7 +28,7 @@ def verify_jwt(token: str):
         if len(jwt_secret.encode("utf-8")) < 32:
             raise ValueError("JWT_SECRET must contain at least 32 bytes.")
 
-        # Verify token signature and decode payload
+        # Verify JWT signature and decode payload
         payload = jwt.decode(
             token.strip(),
             jwt_secret,
@@ -39,6 +37,14 @@ def verify_jwt(token: str):
                 "require": ["jti", "iat"]
             }
         )
+
+        # Verify token against active database record
+        db_response = verify_active_token(payload["jti"])
+        if not db_response["success"]:
+            return {
+                "success": False,
+                "error": db_response["error"]
+            }
         return {
             "success": True,
             "message": "JWT verified successfully.",
@@ -85,5 +91,4 @@ if __name__ == "__main__":
         result = verify_jwt(generated["token"])
     else:
         result = generated
-
     print(json.dumps(result, indent=4))

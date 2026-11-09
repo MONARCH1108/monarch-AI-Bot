@@ -13,6 +13,7 @@ from chat_Management.get_all_chats import get_all_chats
 from APIAuth.basic_auth import verify_basic_auth
 from APIAuth.generate_jwt import generate_jwt
 from APIAuth.verify_jwt import verify_jwt
+from APIAuth.token_database import store_active_token
 
 app = FastAPI()
 
@@ -72,11 +73,20 @@ def require_jwt(
 def create_access_token(
     authenticated: bool = Depends(require_basic_auth)
 ):
+    # Generate JWT
     response = generate_jwt()
     if not response["success"]:
         raise HTTPException(
             status_code=500,
             detail=response["error"]
+        )
+
+    # Store or replace active JWT
+    db_response = store_active_token(response["jti"])
+    if not db_response["success"]:
+        raise HTTPException(
+            status_code=500,
+            detail=db_response["error"]
         )
     return response
 
@@ -93,7 +103,7 @@ def available_models():
     return response
 
 # Signup API
-@app.post("/signup")
+@app.post("/signup", dependencies=[Depends(require_jwt)])
 def user_signup(request: SignupRequest):
     response = signup(request.username)
     if not response["success"]:
@@ -104,7 +114,7 @@ def user_signup(request: SignupRequest):
     return response
 
 # Login API
-@app.post("/login")
+@app.post("/login", dependencies=[Depends(require_jwt)])
 def user_login(request: LoginRequest):
     response = login(
         username=request.username,
