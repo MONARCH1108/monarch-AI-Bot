@@ -12,7 +12,7 @@ import {
 } from "@ant-design/icons";
 
 import "./Sidebar.css";
-import monarchLogo from "../src/assets/monarch-logo.png"
+import monarchLogo from "../assets/monarch-logo.png"
 
 const { Sider } = Layout;
 
