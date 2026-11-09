@@ -154,7 +154,11 @@ The application expects the following tables in your PostgreSQL database:
 - **`conversations`** — stores chat conversations (`chat_id`, `user_uuid`, `title`, `created_at`, `updated_at`).
 - **`messages`** — stores individual messages (`message_id`, `user_uuid`, `chat_id`, `question`, `answer`, `model`, `created_at`).
 
-> No migration files are included. Set up the schema manually or with your preferred migration tool.
+No migration files are included. Set up the schema manually or with your preferred migration tool.
+
+### Running the Frontend
+
+No frontend application exists in this repository.
 
 ### Running the Backend
 
@@ -187,19 +191,8 @@ For detailed request/response schemas and flow documentation, see the [Documenta
 
 Detailed technical documentation is available in the `Documents/` directory:
 
-- **[Project Structure](Documents/PROJECT_STRUCTURE.md)** — Complete file inventory, function documentation, database schema, API inventory, dependencies, and environment configuration.
+- **[Project Structure](Documents/PROJECT_STRUCTURE.md)** — Complete directory tree with functions, database schema, API inventory, dependencies, and environment configuration.
 - **[Project Flows](Documents/PROJECT_FLOWS.md)** — Application architecture, authentication flows, chat flows, LLM integration, data flows, error handling, and Mermaid diagrams.
-
----
-
-## Security and Privacy Considerations
-
-- **No passwords:** Authentication uses username + UUID pairs (guest model).
-- **24-hour expiration:** User accounts automatically become inaccessible after 24 hours (though data persists in the database).
-- **No token/session management:** Each request independently verifies identity.
-- **Secrets management:** API keys and database credentials are stored in `.env` and excluded from version control.
-- **No CORS configuration:** CORS is not currently configured; add middleware if serving a frontend.
-- **No rate limiting:** The API does not implement rate limiting (Groq API has its own rate limits).
 
 ---
 
@@ -217,7 +210,17 @@ Detailed technical documentation is available in the `Documents/` directory:
 
 ---
 
+## Security and Privacy Considerations
+
+- **No passwords:** Authentication uses username + UUID pairs (guest model).
+- **24-hour expiration:** User accounts automatically become inaccessible after 24 hours (data persists in the database).
+- **No token/session management:** Each request independently verifies identity.
+- **Secrets management:** API keys and database credentials are stored in `.env` and excluded from version control.
+- **No CORS configuration:** CORS is not currently configured; add middleware if serving a frontend.
+- **No rate limiting:** The API does not implement rate limiting (Groq API has its own rate limits).
+
+---
+
 ## License
 
 No license file is currently included in the repository.
-

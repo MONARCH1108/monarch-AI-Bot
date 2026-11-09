@@ -7,9 +7,9 @@
 | Field | Details |
 |---|---|
 | **Project Name** | Monarch AI Bot |
-| **Project Purpose** | A backend API chatbot application that allows guest users to sign up, log in (within a 24-hour window), and interact with LLM models through the Groq API. Conversations and messages are persisted in a PostgreSQL database. |
+| **Project Purpose** | A backend REST API chatbot that allows guest users to sign up, log in (within a 24-hour window), and interact with LLM models through the Groq API. Conversations and messages are persisted in a PostgreSQL database. |
 | **Main Technologies** | Python 3.14, FastAPI, Groq SDK, PostgreSQL (Neon), psycopg 3, Pydantic, uvicorn, python-dotenv |
-| **High-Level Architecture** | Backend-only REST API. FastAPI serves HTTP endpoints; business logic is organized into `auth/`, `chat/`, `chat_Management/`, and `LLM/` modules. Data is persisted in a Neon PostgreSQL database. LLM completions are generated via the Groq cloud API. |
+| **High-Level Architecture** | Backend-only REST API. FastAPI serves HTTP endpoints; business logic is organized into `auth/`, `chat/`, `chat_Management/`, and `LLM/` modules. Data is persisted in a Neon PostgreSQL database. LLM completions are generated via the Groq cloud API. No frontend exists in this repository. |
 
 ---
 
@@ -19,18 +19,27 @@
 monarch-AI-Bot/
 ├── auth/
 │   ├── database.py
+│   │   └── get_db_connection() — Establishes and returns a connection to Neon PostgreSQL using DATABASE_URL.
 │   ├── login.py
+│   │   └── login() — Authenticates a user by matching username and UUID, enforcing a 24-hour validity window.
 │   └── signup.py
+│       └── signup() — Validates username, generates a UUID v4, and inserts a new guest user into the database.
 │
 ├── chat/
 │   ├── chat_service.py
+│   │   └── chat_service() — Orchestrates the full chat flow: validates user, checks eligibility, manages conversation, retrieves history, calls LLM, saves message, and returns the response.
 │   ├── create_chat.py
+│   │   └── create_chat() — Inserts a new conversation into the conversations table and returns its metadata.
 │   ├── get_history.py
+│   │   └── get_chat_history() — Retrieves all messages for a specific conversation ordered chronologically.
 │   └── save_message.py
+│       └── save_message() — Persists a question-answer pair to the messages table and updates the conversation timestamp.
 │
 ├── chat_Management/
 │   ├── chat_history.py
+│   │   └── chat_history() — Validates UUID formats and delegates to get_chat_history to retrieve conversation messages.
 │   └── get_all_chats.py
+│       └── get_all_chats() — Retrieves all conversations belonging to a user ordered by most recently updated.
 │
 ├── Documents/
 │   ├── PROJECT_FLOWS.md
@@ -39,168 +48,25 @@ monarch-AI-Bot/
 │
 ├── LLM/
 │   ├── groq_chat.py
+│   │   └── groq_chat() — Builds a messages array from history and system prompt, calls Groq chat completions, and returns the generated response with token usage.
 │   ├── groq_connection.py
+│   │   ├── format_created_date() — Converts a Unix timestamp into a human-readable UTC date string.
+│   │   └── get_available_models() — Fetches all active models from the Groq API and returns their metadata.
 │   └── prompt.py
 │
 ├── .gitignore
 ├── .python-version
 ├── main.py
+│   ├── available_models() — GET /models handler; retrieves all available Groq LLM models.
+│   ├── user_signup() — POST /signup handler; registers a new guest user.
+│   ├── user_login() — POST /login handler; authenticates a user with username and UUID.
+│   ├── user_chat() — POST /chat handler; sends a message and returns the LLM response.
+│   ├── user_chat_history() — POST /chat/history handler; retrieves message history for a conversation.
+│   └── user_all_chats() — POST /chats handler; retrieves all conversations for a user.
 ├── pyproject.toml
 ├── README.md
 └── uv.lock
 ```
-
-**Excluded:** `.venv/`, `.env`, `__pycache__/`, `*.pyc` files, and other generated artifacts.
-
----
-
-## C. File-Level Documentation
-
-### Root Files
-
-#### `main.py`
-- **Purpose:** Application entry point. Defines the FastAPI app instance, Pydantic request schemas, and all API route handlers.
-- **Important Imports:** `FastAPI`, `HTTPException` (fastapi); `BaseModel` (pydantic); `get_available_models` (LLM); `signup` (auth); `login` (auth); `chat_service` (chat); `chat_history`, `get_all_chats` (chat_Management).
-- **Classes:** `SignupRequest`, `LoginRequest`, `ChatRequest`, `ChatHistoryRequest`, `AllChatsRequest` — all Pydantic `BaseModel` subclasses used to validate incoming request bodies.
-- **Functions:** `available_models`, `user_signup`, `user_login`, `user_chat`, `user_chat_history`, `user_all_chats` — FastAPI route handlers (see Function-Level Documentation below).
-
-#### `pyproject.toml`
-- **Purpose:** Project metadata and dependency specification (PEP 621). Managed by `uv`.
-- **Key Data:** Project name `monarch-ai-bot`, version `0.1.0`, Python ≥ 3.14, dependencies: `dotenv`, `fastapi`, `groq`, `psycopg[binary]`, `uvicorn`.
-
-#### `.python-version`
-- **Purpose:** Pins the Python version for `uv` / `pyenv`. Value: `3.14`.
-
-#### `.gitignore`
-- **Purpose:** Excludes `.venv`, `.env`, `__pycache__/`, compiled Python files, and `Documents/PROMPT.md` from version control.
-
-#### `uv.lock`
-- **Purpose:** Lock file generated by the `uv` package manager, pinning exact dependency versions.
-
----
-
-### `auth/` — Authentication Module
-
-#### `auth/database.py`
-- **Purpose:** Provides a reusable database connection factory for Neon PostgreSQL.
-- **Important Imports:** `os`, `psycopg`, `load_dotenv` (dotenv).
-- **Functions:** `get_db_connection`.
-- **Important Variables:** Reads `DATABASE_URL` from environment.
-
-#### `auth/signup.py`
-- **Purpose:** Handles new guest user registration with UUID generation and database insertion.
-- **Important Imports:** `uuid`; `UniqueViolation`, `OperationalError`, `DataError`, `Error` (psycopg.errors); `get_db_connection` (auth.database).
-- **Functions:** `signup`.
-
-#### `auth/login.py`
-- **Purpose:** Authenticates an existing user by matching username + UUID, enforcing a 24-hour validity window.
-- **Important Imports:** `UUID` (uuid); `OperationalError`, `DataError`, `Error` (psycopg.errors); `get_db_connection` (auth.database).
-- **Functions:** `login`.
-
----
-
-### `chat/` — Core Chat Module
-
-#### `chat/chat_service.py`
-- **Purpose:** Orchestrates the full chat flow: validates user eligibility, manages conversations, retrieves history, calls the LLM, and saves messages.
-- **Important Imports:** `UUID` (uuid); `psycopg`; `get_db_connection` (auth.database); `create_chat` (chat.create_chat); `get_chat_history` (chat.get_history); `save_message` (chat.save_message); `groq_chat` (LLM.groq_chat).
-- **Functions:** `chat_service`.
-
-#### `chat/create_chat.py`
-- **Purpose:** Creates a new conversation record in the `conversations` table for a given user.
-- **Important Imports:** `psycopg`; `get_db_connection` (auth.database).
-- **Functions:** `create_chat`.
-
-#### `chat/get_history.py`
-- **Purpose:** Retrieves all messages for a specific conversation, ordered chronologically.
-- **Important Imports:** `psycopg`; `get_db_connection` (auth.database).
-- **Functions:** `get_chat_history`.
-
-#### `chat/save_message.py`
-- **Purpose:** Persists a question-answer pair to the `messages` table and updates the conversation's `updated_at` timestamp.
-- **Important Imports:** `psycopg`; `get_db_connection` (auth.database).
-- **Functions:** `save_message`.
-
----
-
-### `chat_Management/` — Chat Management Module
-
-#### `chat_Management/chat_history.py`
-- **Purpose:** Validates UUIDs and delegates to `get_chat_history` to retrieve conversation history. Acts as a validation wrapper for the API layer.
-- **Important Imports:** `UUID` (uuid); `get_chat_history` (chat.get_history).
-- **Functions:** `chat_history`.
-
-#### `chat_Management/get_all_chats.py`
-- **Purpose:** Retrieves all conversations belonging to a user, ordered by most recently updated.
-- **Important Imports:** `UUID` (uuid); `psycopg`; `get_db_connection` (auth.database).
-- **Functions:** `get_all_chats`.
-
----
-
-### `LLM/` — LLM Integration Module
-
-#### `LLM/groq_connection.py`
-- **Purpose:** Connects to the Groq API and retrieves the list of currently available LLM models with metadata.
-- **Important Imports:** `os`; `Groq`, `APIConnectionError`, `APIStatusError`, `AuthenticationError`, `RateLimitError` (groq); `load_dotenv` (dotenv); `datetime`, `timezone` (datetime).
-- **Functions:** `format_created_date`, `get_available_models`.
-- **Important Variables:** Reads `GROQ_API_KEY` from environment.
-
-#### `LLM/groq_chat.py`
-- **Purpose:** Constructs a messages array (system prompt + history + user message) and calls the Groq chat completions API to generate a response.
-- **Important Imports:** `os`; `Groq`, `APIConnectionError`, `APIStatusError`, `AuthenticationError`, `RateLimitError` (groq); `SYSTEM_PROMPT` (LLM.prompt); `load_dotenv` (dotenv).
-- **Functions:** `groq_chat`.
-- **Important Variables:** Reads `GROQ_API_KEY` from environment.
-
-#### `LLM/prompt.py`
-- **Purpose:** Defines the system prompt constant that configures the AI assistant's personality, behaviour rules, and response guidelines.
-- **Important Variables:** `SYSTEM_PROMPT` — a multi-line string constant.
-
----
-
-## D. Function-Level Documentation
-
-### Route Handlers (`main.py`)
-
-| Function | File | Parameters | Returns | Responsibility |
-|---|---|---|---|---|
-| `available_models` | `main.py` | None | JSON list of Groq models | GET `/models` — retrieves all available Groq LLM models. |
-| `user_signup` | `main.py` | `request: SignupRequest` (username) | JSON user object with UUID | POST `/signup` — registers a new guest user. |
-| `user_login` | `main.py` | `request: LoginRequest` (username, user_uuid) | JSON user object | POST `/login` — authenticates an existing user. |
-| `user_chat` | `main.py` | `request: ChatRequest` (user_uuid, model, message, chat_id?) | JSON with answer, model, usage | POST `/chat` — sends a message and returns the LLM response. |
-| `user_chat_history` | `main.py` | `request: ChatHistoryRequest` (user_uuid, chat_id) | JSON with message history | POST `/chat/history` — retrieves all messages in a conversation. |
-| `user_all_chats` | `main.py` | `request: AllChatsRequest` (user_uuid) | JSON list of conversations | POST `/chats` — retrieves all conversations for a user. |
-
-### Auth Functions
-
-| Function | File | Parameters | Returns | Responsibility |
-|---|---|---|---|---|
-| `get_db_connection` | `auth/database.py` | None | `psycopg.Connection` | Establishes and returns a connection to Neon PostgreSQL using `DATABASE_URL`. |
-| `signup` | `auth/signup.py` | `username: str` | Dict with success status and user data | Validates username, generates a UUID v4, inserts a new user into the `users` table, and returns user details. |
-| `login` | `auth/login.py` | `username: str`, `user_uuid: str` | Dict with success status and user data | Validates credentials, checks username + UUID match in the `users` table, enforces the 24-hour validity window. |
-
-### Chat Functions
-
-| Function | File | Parameters | Returns | Responsibility |
-|---|---|---|---|---|
-| `chat_service` | `chat/chat_service.py` | `user_uuid: str`, `model: str`, `message: str`, `chat_id: str = None` | Dict with answer, model, usage, chat_id | Orchestrates the full chat flow: validates user, checks 24-hour eligibility, verifies conversation ownership, creates new conversation if needed, retrieves history, calls LLM, saves message, and returns the response. |
-| `create_chat` | `chat/create_chat.py` | `user_uuid: str` | Dict with chat details | Inserts a new row into the `conversations` table and returns the created conversation metadata. |
-| `get_chat_history` | `chat/get_history.py` | `user_uuid: str`, `chat_id: str` | Dict with list of messages | Queries the `messages` table for all messages in a conversation, ordered by `created_at ASC`. |
-| `save_message` | `chat/save_message.py` | `user_uuid: str`, `chat_id: str`, `question: str`, `answer: str`, `model: str` | Dict with saved message details | Inserts a question-answer pair into the `messages` table and updates the conversation's `updated_at` timestamp. |
-
-### Chat Management Functions
-
-| Function | File | Parameters | Returns | Responsibility |
-|---|---|---|---|---|
-| `chat_history` | `chat_Management/chat_history.py` | `user_uuid: str`, `chat_id: str` | Dict with message history | Validates UUID formats and delegates to `get_chat_history` to retrieve conversation messages. |
-| `get_all_chats` | `chat_Management/get_all_chats.py` | `user_uuid: str` | Dict with list of conversations | Retrieves all conversations for a user from the `conversations` table, ordered by `updated_at DESC`. |
-
-### LLM Functions
-
-| Function | File | Parameters | Returns | Responsibility |
-|---|---|---|---|---|
-| `format_created_date` | `LLM/groq_connection.py` | `timestamp: int` | Formatted date string (`"DD Month YYYY"`) | Converts a Unix timestamp into a human-readable UTC date. |
-| `get_available_models` | `LLM/groq_connection.py` | None | Dict with list of model metadata | Fetches all active models from the Groq API and returns their id, owner, creation date, context window, and max completion tokens. |
-| `groq_chat` | `LLM/groq_chat.py` | `model: str`, `message: str`, `history: list = None` | Dict with LLM response and token usage | Constructs the messages array (system prompt + conversation history + current message), calls Groq chat completions API, and returns the generated response with usage statistics. |
 
 ---
 
@@ -235,18 +101,26 @@ monarch-AI-Bot/
 |---|---|
 | `uv` | Python package and project manager (generates `uv.lock`) |
 
+### Frontend Dependencies
+
+No frontend exists in this repository. There are no frontend dependencies.
+
+### Development and Testing Dependencies
+
+No dedicated testing framework or development-only dependencies are declared in `pyproject.toml`.
+
 ---
 
 ## F. Database Structure
 
-The database schema is inferred from the SQL queries executed in the codebase. The database is hosted on **Neon PostgreSQL**.
+The database schema is inferred from SQL queries in the codebase. The database is hosted on **Neon PostgreSQL**.
 
 ### Table: `users`
 
 | Column | Data Type (inferred) | Constraints | Description |
 |---|---|---|---|
 | `user_uuid` | `UUID` | Primary Key | Unique identifier for the user, generated server-side via `uuid.uuid4()`. |
-| `username` | `VARCHAR(50)` | Unique, Not Null | User-chosen display name. Case-sensitive. |
+| `username` | `VARCHAR(50)` | Unique (`users_username_key`), Not Null | User-chosen display name. Case-sensitive. |
 | `created_at` | `TIMESTAMP` | Not Null, Default `NOW()` | Timestamp of account creation. Used to enforce the 24-hour validity window. |
 
 ### Table: `conversations`
@@ -255,9 +129,9 @@ The database schema is inferred from the SQL queries executed in the codebase. T
 |---|---|---|---|
 | `chat_id` | `UUID` | Primary Key, Default generated | Unique conversation identifier. |
 | `user_uuid` | `UUID` | Foreign Key → `users.user_uuid`, Not Null | Owner of the conversation. |
-| `title` | `VARCHAR` / `TEXT` | Nullable | Conversation title (currently returned as-is; no title generation logic is implemented). |
+| `title` | `VARCHAR` / `TEXT` | Nullable | Conversation title (returned as-is; no title generation logic is implemented). |
 | `created_at` | `TIMESTAMP` | Not Null, Default `NOW()` | Timestamp of conversation creation. |
-| `updated_at` | `TIMESTAMP` | Not Null, Default `NOW()` | Timestamp of last message in the conversation. Updated on each `save_message` call. |
+| `updated_at` | `TIMESTAMP` | Not Null, Default `NOW()` | Timestamp of last activity. Updated on each `save_message` call. |
 
 ### Table: `messages`
 
@@ -283,9 +157,21 @@ conversations.chat_id  ──<  messages.chat_id
 
 - `users_username_key` — enforces uniqueness on `users.username` (referenced in signup error handling).
 
+### Database Models and Files
+
+There are no ORM model classes. Database interactions are performed via raw SQL queries using `psycopg` in the following files:
+- `auth/database.py` — connection factory
+- `auth/signup.py` — inserts into `users`
+- `auth/login.py` — selects from `users`
+- `chat/chat_service.py` — selects from `users` and `conversations`
+- `chat/create_chat.py` — inserts into `conversations`
+- `chat/get_history.py` — selects from `messages`
+- `chat/save_message.py` — inserts into `messages`, updates `conversations`
+- `chat_Management/get_all_chats.py` — selects from `conversations`
+
 ### Migrations
 
-No migration files or migration framework was found in the repository. The database schema is assumed to be managed externally.
+No migration files or migration framework was found in the repository.
 
 ---
 
@@ -304,6 +190,18 @@ No migration files or migration framework was found in the repository. The datab
 
 There is no token-based or session-based authentication middleware. User identity is verified per-request by matching `user_uuid` (and `username` for login) against database records. The 24-hour account expiration is checked in `login` and `chat_service`.
 
+### Request/Response Details
+
+All endpoints accept and return `application/json`. Request bodies are validated using Pydantic models defined in `main.py`:
+
+| Pydantic Model | Fields | Used By |
+|---|---|---|
+| `SignupRequest` | `username: str` | `POST /signup` |
+| `LoginRequest` | `username: str`, `user_uuid: str` | `POST /login` |
+| `ChatRequest` | `user_uuid: str`, `model: str`, `message: str`, `chat_id: str \| None` | `POST /chat` |
+| `ChatHistoryRequest` | `user_uuid: str`, `chat_id: str` | `POST /chat/history` |
+| `AllChatsRequest` | `user_uuid: str` | `POST /chats` |
+
 ---
 
 ## H. Environment Configuration
@@ -315,5 +213,4 @@ There is no token-based or session-based authentication middleware. User identit
 
 Both variables are loaded from a `.env` file using `python-dotenv`. The `.env` file is excluded from version control via `.gitignore`.
 
-> **Note:** No actual secret values, API keys, or credentials are exposed in this documentation.
-
+No actual secret values, API keys, or credentials are exposed in this documentation.
