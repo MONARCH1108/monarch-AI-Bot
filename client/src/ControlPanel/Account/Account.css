@@ -182,7 +182,13 @@
     font-size: 11px;
 }
 
-.account-container .ant-alert-message {
+/* Force alert text to white */
+.account-container .ant-alert .ant-alert-content,
+.account-container .ant-alert .ant-alert-message,
+.account-container .ant-alert .ant-alert-description,
+.account-container .ant-alert .ant-alert-title {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
     font-size: 11px;
     line-height: 1.5;
 }
@@ -197,7 +203,10 @@
     background: rgba(40, 130, 85, 0.12);
 }
 
-
+/* Success icon */
+.account-container .ant-alert-success .ant-alert-icon {
+    color: #52c41a !important;
+}
 /* =========================================
    BLOCK 7 — COLLAPSED / NARROW PANEL
 ========================================= */
@@ -225,4 +234,66 @@
 .account-form .ant-input-affix-wrapper > input.ant-input::placeholder {
     color: rgba(220, 215, 230, 0.45) !important;
     -webkit-text-fill-color: rgba(220, 215, 230, 0.45);
+}
+
+
+/* =========================================
+   BLOCK 8 — ACCOUNT UUID SECTION
+========================================= */
+
+.account-uuid-section {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 11px;
+    padding: 14px;
+    border: 1px solid rgba(153, 105, 197, 0.25);
+    border-radius: 9px;
+    background: rgba(117, 76, 158, 0.08);
+}
+
+.account-uuid-heading {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    color: #c6a6e5;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.account-uuid-section p {
+    margin: 0;
+    color: rgba(220, 215, 230, 0.65);
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+.account-uuid-copy {
+    display: flex;
+    align-items: stretch;
+    gap: 7px;
+    width: 100%;
+}
+
+.account-uuid-copy .ant-input {
+    min-width: 0;
+    height: 36px;
+    color: #ffffff !important;
+    font-size: 11px;
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+.account-uuid-copy .ant-btn {
+    height: 36px;
+    flex-shrink: 0;
+    border: none;
+    border-radius: 7px;
+    color: #ffffff;
+    background: #754c9e;
+}
+
+.account-uuid-copy .ant-btn:hover {
+    color: #ffffff !important;
+    background: #895eb4 !important;
 }

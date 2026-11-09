@@ -3,48 +3,71 @@ import { Layout, Menu, Button, Avatar, Tooltip } from "antd";
 import {
     PlusOutlined,
     MessageOutlined,
-    ApiOutlined,
-    TeamOutlined,
-    SearchOutlined,
     MenuFoldOutlined,
     MenuUnfoldOutlined,
     UserOutlined
 } from "@ant-design/icons";
 
 import "./Sidebar.css";
-import monarchLogo from "../assets/monarch-logo.png"
+import monarchLogo from "../assets/monarch-logo.png";
 
 const { Sider } = Layout;
 
-function Sidebar() {
+// BLOCK 1: FORMAT CONVERSATION DATE
+function formatChatDate(dateString) {
+    if (!dateString) return "Untitled conversation";
+
+    const date = new Date(dateString);
+
+    if (Number.isNaN(date.getTime())) {
+        return "Unknown date";
+    }
+
+    return new Intl.DateTimeFormat("en-IN", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true
+    }).format(date);
+}
+
+function Sidebar({
+    user = null,
+    conversations = [],
+    chatsLoading = false,
+    chatsError = "",
+    selectedChatId = null,
+    onSelectChat
+}) {
     const [collapsed, setCollapsed] = useState(false);
 
-    const navigationItems = [
-        {
-            key: "chat",
-            icon: <MessageOutlined />,
-            label: "Chat"
-        },
-        {
-            key: "api",
-            icon: <ApiOutlined />,
-            label: "API"
-        },
-        {
-            key: "community",
-            icon: <TeamOutlined />,
-            label: "Community"
-        }
-    ];
+    // BLOCK 2: SORT CONVERSATIONS
+    const sortedConversations = [...conversations].sort(
+        (a, b) =>
+            new Date(b.updated_at) - new Date(a.updated_at)
+    );
 
-    const chatItems = [
-        { key: "chat-1", label: "First conversation" },
-        { key: "chat-2", label: "Second conversation" },
-        { key: "chat-3", label: "Third conversation" }
-    ];
+    // BLOCK 3: CONVERSATION MENU ITEMS
+    const chatItems = sortedConversations.map((chat) => ({
+        key: chat.chat_id,
+        icon: <MessageOutlined />,
+        label: formatChatDate(chat.updated_at)
+    }));
+
+    // BLOCK 4: HANDLE CONVERSATION SELECTION
+    const handleChatSelection = ({ key }) => {
+        onSelectChat?.(key);
+    };
+
+    // BLOCK 5: USER PROFILE DETAILS
+    const username = user?.username || "Guest User";
+    const accountStatus = user ? "Guest Account" : "Not signed in";
 
     return (
-        <Sider motion={true}
+        <Sider
+            motion={true}
             className="sidebar"
             width={250}
             collapsedWidth={80}
@@ -66,7 +89,13 @@ function Sidebar() {
                     </div>
 
                     <div className="sidebar-header-actions">
-                        <Tooltip title={collapsed ? "Expand sidebar" : "Collapse sidebar"}>
+                        <Tooltip
+                            title={
+                                collapsed
+                                    ? "Expand sidebar"
+                                    : "Collapse sidebar"
+                            }
+                        >
                             <Button
                                 type="text"
                                 icon={
@@ -91,49 +120,63 @@ function Sidebar() {
                     </Button>
                 </div>
 
-                {/* BLOCK 3: NAVIGATION */}
-                <div className="sidebar-navigation">
-                    <Menu
-                        mode="inline"
-                        theme="dark"
-                        selectedKeys={["chat"]}
-                        items={navigationItems}
-                    />
-                </div>
-
-                {/* BLOCK 4: CHAT HISTORY */}
+                {/* BLOCK 3: RECENT CHATS */}
                 <div className="sidebar-chat-history">
+
                     {!collapsed && (
                         <div className="chat-history-heading">
                             RECENT CHATS
                         </div>
                     )}
 
+                    {chatsLoading && !collapsed && (
+                        <div className="chat-history-message">
+                            Loading conversations...
+                        </div>
+                    )}
+
+                    {chatsError && !collapsed && (
+                        <div className="chat-history-message">
+                            {chatsError}
+                        </div>
+                    )}
+
+                    {!chatsLoading &&
+                        !chatsError &&
+                        chatItems.length === 0 &&
+                        !collapsed && (
+                            <div className="chat-history-message">
+                                No conversations yet
+                            </div>
+                        )}
+
                     <Menu
                         mode="inline"
                         theme="dark"
-                        items={chatItems.map((chat) => ({
-                            key: chat.key,
-                            icon: <MessageOutlined />,
-                            label: chat.label
-                        }))}
+                        items={chatItems}
+                        selectedKeys={selectedChatId ? [selectedChatId] : []}
+                        onClick={handleChatSelection}
                     />
+
                 </div>
 
-                {/* BLOCK 5: USER PROFILE */}
+                {/* BLOCK 4: USER PROFILE */}
                 <div className="sidebar-user">
+
                     <Avatar icon={<UserOutlined />} />
 
                     {!collapsed && (
                         <div className="sidebar-user-details">
                             <span className="sidebar-user-name">
-                                Guest User
+                                {username}
                             </span>
+
                             <span className="sidebar-user-status">
-                                Account profile
+                                {accountStatus}
                             </span>
                         </div>
                     )}
+
                 </div>
 
             </div>
