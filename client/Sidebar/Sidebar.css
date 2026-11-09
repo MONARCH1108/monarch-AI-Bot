@@ -1,0 +1,431 @@
+
+/* =========================================
+   BLOCK 1 — SIDEBAR BASE
+========================================= */
+
+.sidebar.ant-layout-sider {
+    flex: 0 0 250px;
+    width: 250px;
+    max-width: 250px;
+    min-width: 250px;
+
+    height: 100%;
+
+    background: rgba(25, 26, 29, 0.96) !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.09);
+
+    transition:
+        width 650ms cubic-bezier(0.22, 1, 0.36, 1),
+        min-width 650ms cubic-bezier(0.22, 1, 0.36, 1),
+        max-width 650ms cubic-bezier(0.22, 1, 0.36, 1),
+        flex-basis 650ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.sidebar.ant-layout-sider-collapsed {
+    flex: 0 0 80px;
+    width: 80px;
+    max-width: 80px;
+    min-width: 80px;
+}
+
+.sidebar .ant-layout-sider-children {
+    height: 100%;
+    overflow: hidden;
+}
+
+.sidebar-container {
+    display: flex;
+    flex-direction: column;
+
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+
+    padding: 12px;
+    overflow: hidden;
+
+    transition: padding 500ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* =========================================
+   BLOCK 2 — BRAND HEADER
+========================================= */
+
+.sidebar-header {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    min-height: 125px;
+
+    margin-bottom: 16px;
+    padding: 10px;
+
+    background: #000000;
+    border-radius: 8px;
+}
+
+.sidebar-brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    min-width: 0;
+}
+
+.sidebar-logo {
+    display: block;
+
+    width: 155px;
+    height: 105px;
+
+    object-fit: contain;
+    object-position: center;
+
+    flex-shrink: 0;
+}
+
+/* Collapse button */
+
+.sidebar-header-actions {
+    position: absolute;
+
+    top: 10px;
+    right: 8px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sidebar-header-actions .ant-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 30px;
+    height: 30px;
+
+    padding: 0;
+
+    color: #ffffff !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.sidebar-header-actions .ant-btn:hover {
+    color: #d2a5ff !important;
+    background: rgba(255, 255, 255, 0.10) !important;
+}
+
+
+/* =========================================
+   BLOCK 3 — NEW CHAT BUTTON
+========================================= */
+
+.sidebar-new-chat {
+    width: 100%;
+    margin-bottom: 12px;
+}
+
+.sidebar-new-chat .new-chat-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    height: 36px;
+
+    color: #eeeeF2 !important;
+    font-size: 12px;
+    font-weight: 500;
+
+    background: transparent !important;
+
+    border: 1px solid rgba(178, 126, 255, 0.65) !important;
+    border-radius: 9px;
+
+    box-shadow: none !important;
+}
+
+.sidebar-new-chat .new-chat-button:hover {
+    color: #ffffff !important;
+
+    background: rgba(178, 126, 255, 0.09) !important;
+
+    border-color: #c28cff !important;
+}
+
+.sidebar-new-chat .new-chat-button .anticon {
+    font-size: 13px;
+}
+
+/* =========================================
+   BLOCK 4 — ANT DESIGN MENU RESET
+========================================= */
+
+.sidebar .ant-menu,
+.sidebar .ant-menu-dark,
+.sidebar .ant-menu-dark > .ant-menu {
+    width: 100%;
+
+    color: #9999a3 !important;
+    background: transparent !important;
+
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.sidebar .ant-menu-inline {
+    border-inline-end: none !important;
+}
+
+.sidebar .ant-menu-item {
+    display: flex;
+    align-items: center;
+
+    width: 100%;
+    height: 34px;
+    line-height: 34px;
+
+    margin: 3px 0 !important;
+    padding-inline: 9px !important;
+
+    color: #92929b !important;
+    font-size: 12px;
+    font-weight: 400;
+
+    background: transparent !important;
+
+    border-radius: 7px !important;
+}
+
+.sidebar .ant-menu-item .ant-menu-item-icon {
+    color: #92929b !important;
+    font-size: 15px;
+}
+
+.sidebar .ant-menu-item .ant-menu-title-content {
+    color: inherit;
+}
+
+.sidebar .ant-menu-item:hover {
+    color: #e5d4ff !important;
+    background: rgba(255, 255, 255, 0.055) !important;
+}
+
+.sidebar .ant-menu-item:hover .ant-menu-item-icon {
+    color: #d2a5ff !important;
+}
+
+/* Selected navigation item */
+
+.sidebar .ant-menu-item-selected,
+.sidebar .ant-menu-dark .ant-menu-item-selected {
+    color: #eeeeF2 !important;
+    background: rgba(255, 255, 255, 0.09) !important;
+}
+
+.sidebar .ant-menu-item-selected .ant-menu-item-icon {
+    color: #d1a2ff !important;
+}
+
+/* Remove default Ant Design selected indicator */
+
+.sidebar .ant-menu-item::after {
+    display: none !important;
+}
+
+/* Remove menu pseudo-elements */
+
+.sidebar .ant-menu::before,
+.sidebar .ant-menu::after {
+    display: none !important;
+}
+
+/* =========================================
+   BLOCK 5 — NAVIGATION
+========================================= */
+
+.sidebar-navigation {
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+/* =========================================
+   BLOCK 6 — CHAT HISTORY
+========================================= */
+
+.sidebar-chat-history {
+    flex: 1;
+    min-height: 0;
+
+    width: 100%;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    padding-top: 15px;
+
+    border-top: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+.chat-history-heading {
+    padding: 0 9px 9px;
+
+    color: #85858f;
+
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+}
+
+.sidebar-chat-history .ant-menu-item {
+    height: 32px;
+    line-height: 32px;
+
+    margin: 2px 0 !important;
+
+    font-size: 11px;
+}
+
+.sidebar-chat-history .ant-menu-item-selected {
+    color: #eeeeF2 !important;
+    background: rgba(255, 255, 255, 0.09) !important;
+}
+
+/* Chat history scrollbar */
+
+.sidebar-chat-history::-webkit-scrollbar {
+    width: 4px;
+}
+
+.sidebar-chat-history::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.sidebar-chat-history::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.13);
+    border-radius: 10px;
+}
+
+.sidebar-chat-history {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.13) transparent;
+}
+
+/* =========================================
+   BLOCK 7 — USER PROFILE
+========================================= */
+
+.sidebar-user {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    width: 100%;
+    min-height: 48px;
+
+    padding: 9px 3px 2px;
+    margin-top: 10px;
+
+    border-top: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+.sidebar-user .ant-avatar {
+    flex-shrink: 0;
+
+    color: #e5d4ff !important;
+    background: linear-gradient(
+        135deg,
+        #514267,
+        #30263e
+    ) !important;
+}
+
+.sidebar-user-details {
+    display: flex;
+    flex-direction: column;
+
+    min-width: 0;
+    overflow: hidden;
+}
+
+.sidebar-user-name {
+    color: #e5e5eb;
+    font-size: 12px;
+    font-weight: 500;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sidebar-user-status {
+    color: #85858f;
+    font-size: 10px;
+
+    white-space: nowrap;
+}
+
+
+
+
+/* =========================================
+   BLOCK 8 — COLLAPSED SIDEBAR HEADER
+========================================= */
+
+.sidebar.ant-layout-sider-collapsed .sidebar-container {
+    padding: 12px 8px;
+}
+
+.sidebar.ant-layout-sider-collapsed .sidebar-header {
+    min-height: 90px;
+    padding: 5px;
+
+    background: #000000;
+}
+
+.sidebar.ant-layout-sider-collapsed .sidebar-brand {
+    justify-content: center;
+}
+
+.sidebar.ant-layout-sider-collapsed .sidebar-logo {
+    width: 62px;
+    height: 62px;
+    object-fit: contain;
+}
+
+.sidebar.ant-layout-sider-collapsed .sidebar-header-actions {
+    position: static;
+    justify-content: center;
+}
+
+.sidebar.ant-layout-sider-collapsed .sidebar-header-actions .ant-btn {
+    color: #ffffff !important;
+}
+
+
+
+/* =========================================
+   BLOCK 9 — REMOVE ANT DESIGN DEFAULTS
+========================================= */
+
+.sidebar .ant-btn::before,
+.sidebar .ant-menu-item::before {
+    display: none !important;
+}
+
+.sidebar .ant-menu-submenu-arrow {
+    color: #9999a3 !important;
+}
+
+.sidebar .ant-wave {
+    display: none !important;
+}
