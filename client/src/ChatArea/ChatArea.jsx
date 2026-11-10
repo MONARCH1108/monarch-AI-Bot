@@ -1,10 +1,13 @@
+
 import { useState } from "react";
+
 import {
     Avatar,
     Button,
     Input,
-    Tooltip
+    Select
 } from "antd";
+
 import {
     RobotOutlined,
     UserOutlined,
@@ -12,20 +15,29 @@ import {
     BulbOutlined,
     FileTextOutlined,
     ReadOutlined,
-    PlusOutlined,
-    PaperClipOutlined,
     SendOutlined
 } from "@ant-design/icons";
+
 import "./ChatArea.css";
+
 const { TextArea } = Input;
 
 function ChatArea({
     chatTitle = null,
     messages = [],
     loading = false,
+    sending = false,
     error = "",
-    onSend
+    onSend,
+
+    // MODEL PROPS
+    availableModels = [],
+    selectedModel,
+    onModelChange,
+    modelsLoading = false,
+    modelsError = ""
 }) {
+
     const [message, setMessage] = useState("");
 
     // BLOCK 1: HANDLE MESSAGE INPUT
@@ -34,15 +46,31 @@ function ChatArea({
     };
 
     // BLOCK 2: HANDLE MESSAGE SUBMISSION
-    const handleSendMessage = () => {
+    const handleSendMessage = async () => {
+
         const cleanMessage = message.trim();
-        if (!cleanMessage || !onSend) return;
-        onSend(cleanMessage);
-        setMessage("");
+
+        if (!cleanMessage || !onSend || sending || loading) {
+            return;
+        }
+
+        try {
+            const result = await onSend(cleanMessage);
+
+            // Clear input only when submission succeeds
+            if (result !== false) {
+                setMessage("");
+            }
+
+        } catch {
+            // Preserve the message if submission fails.
+            // Error display is managed by the parent.
+        }
     };
 
     // BLOCK 3: HANDLE ENTER KEY
     const handleKeyDown = (event) => {
+
         if (
             event.key === "Enter" &&
             !event.shiftKey
@@ -76,20 +104,31 @@ function ChatArea({
         }
     ];
 
-    // BLOCK 5: CHAT EMPTY STATE
+    // BLOCK 5: DYNAMIC MODEL OPTIONS
+    const modelOptions = availableModels.map((model) => ({
+        value: model.id,
+        label: model.id,
+        title: model.id
+    }));
+
+    // BLOCK 6: DETERMINE CHAT SCREEN
     const showWelcomeScreen =
         !chatTitle && messages.length === 0;
+
     return (
         <div className="chat-area">
 
             {/* BLOCK 1: CHAT HEADER */}
             <header className="chat-header">
+
                 <div className="chat-header-info">
+
                     <div className="chat-header-icon">
                         <RobotOutlined />
                     </div>
 
                     <div className="chat-header-details">
+
                         <span className="chat-header-title">
                             {chatTitle || "Monarch AI"}
                         </span>
@@ -98,37 +137,87 @@ function ChatArea({
                             <span className="status-indicator" />
                             AI Assistant
                         </span>
+
                     </div>
+
                 </div>
+
+                {/* BLOCK 2: DYNAMIC MODEL SELECTOR */}
+                <div className="model-selector-container">
+
+                    <Select
+                        className="model-selector"
+                        placeholder={
+                            modelsLoading
+                                ? "Loading models..."
+                                : "Select a model"
+                        }
+                        value={selectedModel || undefined}
+                        options={modelOptions}
+                        onChange={onModelChange}
+                        loading={modelsLoading}
+                        disabled={
+                            modelsLoading ||
+                            availableModels.length === 0
+                        }
+                        showSearch
+                        optionFilterProp="label"
+                        notFoundContent={
+                            modelsLoading
+                                ? "Loading models..."
+                                : modelsError || "No models available"
+                        }
+                        popupMatchSelectWidth={false}
+                        listHeight={300}
+                        title={selectedModel || ""}
+                    />
+
+                    {modelsError && (
+                        <span className="model-error">
+                            {modelsError}
+                        </span>
+                    )}
+
+                </div>
+
             </header>
 
-            {/* BLOCK 2: CHAT MESSAGE CONTAINER */}
+            {/* BLOCK 3: CHAT MESSAGE CONTAINER */}
             <main className="chat-content">
+
                 {showWelcomeScreen ? (
 
-                    /* BLOCK 3: WELCOME SCREEN */
+                    /* BLOCK 4: WELCOME SCREEN */
                     <div className="chat-welcome">
+
                         <div className="welcome-icon">
                             <RobotOutlined />
                         </div>
+
                         <h1>
                             How can I help you today?
                         </h1>
+
                         <p className="welcome-description">
                             Ask questions, explore ideas, or work
                             through a problem with Monarch AI.
                         </p>
+
                         <div className="suggestion-grid">
+
                             {suggestions.map((item) => (
+
                                 <div
                                     className="suggestion-card"
                                     key={item.title}
                                 >
+
                                     <div className="suggestion-icon">
                                         {item.icon}
                                     </div>
 
                                     <div className="suggestion-content">
+
                                         <span className="suggestion-title">
                                             {item.title}
                                         </span>
@@ -136,16 +225,22 @@ function ChatArea({
                                         <span className="suggestion-description">
                                             {item.description}
                                         </span>
+
                                     </div>
+
                                 </div>
+
                             ))}
+
                         </div>
+
                     </div>
 
                 ) : (
 
-                    /* BLOCK 4: CONVERSATION MESSAGES */
+                    /* BLOCK 5: CONVERSATION MESSAGES */
                     <div className="chat-messages">
+
                         {loading && (
                             <div className="chat-loading">
                                 Loading conversation...
@@ -169,6 +264,7 @@ function ChatArea({
                         {!loading &&
                             !error &&
                             messages.map((item, index) => (
+
                                 <div
                                     className="message-pair"
                                     key={`${item.created_at || "message"}-${index}`}
@@ -176,53 +272,76 @@ function ChatArea({
 
                                     {/* USER MESSAGE */}
                                     <div className="message-row user-message">
+
                                         <div className="message-body">
+
                                             <div className="message-role">
                                                 You
                                             </div>
+
                                             <div className="message-text">
                                                 {item.question}
                                             </div>
+
                                         </div>
 
                                         <Avatar
                                             className="message-avatar user-avatar"
                                             icon={<UserOutlined />}
                                         />
+
                                     </div>
 
                                     {/* AI RESPONSE */}
                                     <div className="message-row assistant-message">
+
                                         <Avatar
                                             className="message-avatar assistant-avatar"
                                             icon={<RobotOutlined />}
                                         />
+
                                         <div className="message-body">
+
                                             <div className="message-role">
                                                 Monarch AI
                                             </div>
+
                                             <div className="message-text">
                                                 {item.answer}
                                             </div>
+
                                             {item.model && (
                                                 <div className="message-model">
                                                     {item.model}
                                                 </div>
                                             )}
+
                                         </div>
+
                                     </div>
 
                                 </div>
+
                             ))}
 
+                        {/* BLOCK 6: SENDING INDICATOR */}
+                        {sending && (
+                            <div className="chat-loading">
+                                Monarch AI is thinking...
+                            </div>
+                        )}
+
                     </div>
+
                 )}
 
             </main>
 
-            {/* BLOCK 5: MESSAGE COMPOSER */}
+            {/* BLOCK 7: MESSAGE COMPOSER */}
             <footer className="chat-footer">
+
                 <div className="message-composer">
+
                     <TextArea
                         className="message-input"
                         placeholder="Message Monarch AI..."
@@ -233,41 +352,39 @@ function ChatArea({
                         value={message}
                         onChange={handleMessageChange}
                         onKeyDown={handleKeyDown}
+                        disabled={sending || loading}
                     />
+
                     <div className="composer-actions">
+
                         <div className="composer-tools">
-                            <Tooltip title="Add attachment">
-                                <Button
-                                    type="text"
-                                    icon={<PaperClipOutlined />}
-                                    disabled
-                                />
-                            </Tooltip>
-                            <Tooltip title="More options">
-                                <Button
-                                    type="text"
-                                    icon={<PlusOutlined />}
-                                    disabled
-                                />
-                            </Tooltip>
+                            {/* Reserved for future composer functionality */}
                         </div>
-                        <Tooltip title="Send message">
-                            <Button
-                                type="primary"
-                                className="send-button"
-                                icon={<SendOutlined />}
-                                onClick={handleSendMessage}
-                                disabled={
-                                    !message.trim() || !onSend
-                                }
-                            />
-                        </Tooltip>
+
+                        <Button
+                            type="primary"
+                            className="send-button"
+                            icon={<SendOutlined />}
+                            onClick={handleSendMessage}
+                            loading={sending}
+                            disabled={
+                                !message.trim() ||
+                                !onSend ||
+                                sending ||
+                                loading
+                            }
+                        />
+
                     </div>
+
                 </div>
+
                 <p className="chat-disclaimer">
                     Monarch AI can make mistakes. Verify important information.
                 </p>
+
             </footer>
+
         </div>
     );
 }

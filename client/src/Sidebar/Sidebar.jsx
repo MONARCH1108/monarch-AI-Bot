@@ -1,5 +1,7 @@
+
 import { useState } from "react";
 import { Layout, Menu, Button, Avatar, Tooltip } from "antd";
+
 import {
     PlusOutlined,
     MessageOutlined,
@@ -39,7 +41,8 @@ function Sidebar({
     chatsLoading = false,
     chatsError = "",
     selectedChatId = null,
-    onSelectChat
+    onSelectChat,
+    onNewChat
 }) {
     const [collapsed, setCollapsed] = useState(false);
 
@@ -61,7 +64,12 @@ function Sidebar({
         onSelectChat?.(key);
     };
 
-    // BLOCK 5: USER PROFILE DETAILS
+    // BLOCK 5: HANDLE NEW CHAT
+    const handleNewChat = () => {
+        onNewChat?.();
+    };
+
+    // BLOCK 6: USER PROFILE DETAILS
     const username = user?.username || "Guest User";
     const accountStatus = user ? "Guest Account" : "Not signed in";
 
@@ -115,6 +123,7 @@ function Sidebar({
                         block
                         icon={<PlusOutlined />}
                         className="new-chat-button"
+                        onClick={handleNewChat}
                     >
                         {!collapsed && "New Chat"}
                     </Button>
@@ -154,7 +163,9 @@ function Sidebar({
                         mode="inline"
                         theme="dark"
                         items={chatItems}
-                        selectedKeys={selectedChatId ? [selectedChatId] : []}
+                        selectedKeys={
+                            selectedChatId ? [selectedChatId] : []
+                        }
                         onClick={handleChatSelection}
                     />
 

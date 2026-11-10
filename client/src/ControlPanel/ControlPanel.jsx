@@ -1,7 +1,5 @@
-
 import { useState } from "react";
 import { Layout, Button, Tooltip } from "antd";
-
 import {
     MenuFoldOutlined,
     MenuUnfoldOutlined,
@@ -11,36 +9,79 @@ import {
     CalendarOutlined,
     ClockCircleOutlined
 } from "@ant-design/icons";
-
 import Account from "./Account/Account";
-
 import "./ControlPanel.css";
 
 const { Sider } = Layout;
+
+// BLOCK 1: FORMAT DATE AND TIME
+function formatDateTime(dateValue) {
+    if (!dateValue) return "Not available";
+    const date = new Date(dateValue);
+    if (Number.isNaN(date.getTime())) {
+        return "Not available";
+    }
+    return new Intl.DateTimeFormat("en-IN", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+        timeZone: "Asia/Kolkata"
+    }).format(date);
+}
+
+// BLOCK 2: CALCULATE ACCOUNT EXPIRY
+function getAccountExpiry(user) {
+    if (user?.expires_at) {
+        return user.expires_at;
+    }
+
+    if (!user?.created_at) {
+        return null;
+    }
+
+    const createdAt = new Date(user.created_at);
+
+    if (Number.isNaN(createdAt.getTime())) {
+        return null;
+    }
+
+    const expiryTime = new Date(
+        createdAt.getTime() + 24 * 60 * 60 * 1000
+    );
+
+    return expiryTime;
+}
 
 function ControlPanel({ user = null, onAuthenticated }) {
     const [collapsed, setCollapsed] = useState(false);
     const [activeTab, setActiveTab] = useState("Settings");
 
+    // BLOCK 3: ACCOUNT DETAILS
+    const accountExpiry = getAccountExpiry(user);
+
+    // BLOCK 4: PROFILE DETAILS
     const profileDetails = [
         {
             label: "Username",
-            value: user?.username,
+            value: user?.username || "Not available",
             icon: <UserOutlined />
         },
         {
             label: "UUID",
-            value: user?.user_uuid,
+            value: user?.user_uuid || "Not available",
             icon: <IdcardOutlined />
         },
         {
             label: "Account Created",
-            value: user?.created_at,
+            value: formatDateTime(user?.created_at),
             icon: <CalendarOutlined />
         },
         {
             label: "Account Expires",
-            value: user?.expires_at,
+            value: formatDateTime(accountExpiry),
             icon: <ClockCircleOutlined />
         }
     ];
@@ -60,7 +101,13 @@ function ControlPanel({ user = null, onAuthenticated }) {
 
                 {/* BLOCK 1: PANEL HEADER */}
                 <div className="control-panel-header">
-                    <Tooltip title={collapsed ? "Expand panel" : "Collapse panel"}>
+                    <Tooltip
+                        title={
+                            collapsed
+                                ? "Expand panel"
+                                : "Collapse panel"
+                        }
+                    >
                         <Button
                             type="text"
                             icon={
@@ -127,7 +174,7 @@ function ControlPanel({ user = null, onAuthenticated }) {
                                             </div>
 
                                             <div className="profile-detail-value">
-                                                {item.value || "Not available"}
+                                                {item.value}
                                             </div>
                                         </div>
                                     ))}

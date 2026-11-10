@@ -1,3 +1,4 @@
+
 /* =========================================
    BLOCK 1: CHAT AREA CONTAINER
 ========================================= */
@@ -27,34 +28,42 @@
     border-bottom: 1px solid #29272e;
     background: #19191e;
     flex-shrink: 0;
+    gap: 20px;
 }
 
 .chat-header-info {
     display: flex;
     align-items: center;
     gap: 13px;
+    min-width: 0;
 }
+
 .chat-header-icon {
     display: flex;
     align-items: center;
     justify-content: center;
     width: 40px;
     height: 40px;
+    flex-shrink: 0;
     border-radius: 12px;
     background: #30243d;
     color: #c39aeb;
     font-size: 19px;
 }
+
 .chat-header-details {
     display: flex;
     flex-direction: column;
     gap: 4px;
+    min-width: 0;
 }
+
 .chat-header-title {
     color: #f3eff7;
     font-size: 15px;
     font-weight: 600;
 }
+
 .chat-header-status {
     display: flex;
     align-items: center;
@@ -62,6 +71,7 @@
     color: #92909b;
     font-size: 12px;
 }
+
 .status-indicator {
     width: 7px;
     height: 7px;
@@ -70,7 +80,86 @@
 }
 
 /* =========================================
-   BLOCK 3: CHAT CONTENT
+   BLOCK 3: MODEL SELECTOR
+========================================= */
+
+.model-selector-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    flex-shrink: 0;
+    min-width: 0;
+}
+
+.model-selector {
+    width: 260px;
+}
+
+.model-selector.ant-select .ant-select-selector {
+    min-height: 38px !important;
+    border: 1px solid #46404e !important;
+    border-radius: 9px !important;
+    background: #222127 !important;
+    color: #eee8f4 !important;
+    box-shadow: none !important;
+}
+
+.model-selector.ant-select .ant-select-selection-item,
+.model-selector.ant-select .ant-select-selection-placeholder {
+    display: flex;
+    align-items: center;
+    color: #e8e1ed !important;
+    font-size: 12px;
+}
+
+.model-selector.ant-select .ant-select-arrow {
+    color: #c39aeb;
+}
+
+.model-selector.ant-select-focused .ant-select-selector,
+.model-selector.ant-select:hover .ant-select-selector {
+    border-color: #8056a7 !important;
+}
+
+.model-selector.ant-select-disabled .ant-select-selector {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.ant-select-dropdown {
+    border: 1px solid #46404e;
+    border-radius: 10px;
+    background: #222127;
+}
+
+.ant-select-dropdown .ant-select-item {
+    color: #e8e4eb;
+    font-size: 12px;
+}
+
+.ant-select-dropdown .ant-select-item-option-active {
+    background: #30243d !important;
+}
+
+.ant-select-dropdown .ant-select-item-option-selected {
+    background: #49375b !important;
+    color: #ffffff !important;
+}
+
+.ant-select-dropdown .ant-select-item-option-content {
+    overflow-wrap: anywhere;
+}
+
+.model-error {
+    max-width: 260px;
+    margin-top: 5px;
+    color: #e58e8e;
+    font-size: 10px;
+    text-align: right;
+}
+
+/* =========================================
+   BLOCK 4: CHAT CONTENT
 ========================================= */
 
 .chat-content {
@@ -84,16 +173,18 @@
     scrollbar-width: thin;
     scrollbar-color: #49414f transparent;
 }
+
 .chat-content::-webkit-scrollbar {
     width: 6px;
 }
+
 .chat-content::-webkit-scrollbar-thumb {
     background: #49414f;
     border-radius: 10px;
 }
 
 /* =========================================
-   BLOCK 4: WELCOME SCREEN
+   BLOCK 5: WELCOME SCREEN
 ========================================= */
 
 .chat-welcome {
@@ -141,7 +232,7 @@
 }
 
 /* =========================================
-   BLOCK 5: SUGGESTION GRID
+   BLOCK 6: SUGGESTION GRID
 ========================================= */
 
 .suggestion-grid {
@@ -205,7 +296,7 @@
 }
 
 /* =========================================
-   BLOCK 6: CHAT MESSAGES
+   BLOCK 7: CHAT MESSAGES
 ========================================= */
 
 .chat-messages {
@@ -216,36 +307,44 @@
     margin: 0 auto;
     padding: 35px 28px 45px;
 }
+
 .message-pair {
     display: flex;
     flex-direction: column;
     gap: 28px;
     margin-bottom: 35px;
 }
+
 .message-row {
     display: flex;
     align-items: flex-start;
     gap: 14px;
     width: 100%;
 }
+
 .user-message {
     justify-content: flex-end;
 }
+
 .assistant-message {
     justify-content: flex-start;
 }
+
 .message-avatar {
     flex-shrink: 0;
     margin-top: 2px;
 }
+
 .user-avatar {
     background: #49375b;
     color: #e1c6fa;
 }
+
 .assistant-avatar {
     background: #30243d;
     color: #c49be9;
 }
+
 .message-body {
     display: flex;
     flex-direction: column;
@@ -253,11 +352,13 @@
     max-width: 85%;
     min-width: 0;
 }
+
 .message-role {
     color: #c6bdcf;
     font-size: 12px;
     font-weight: 600;
 }
+
 .message-text {
     color: #e8e4eb;
     font-size: 14px;
@@ -265,6 +366,7 @@
     white-space: pre-wrap;
     overflow-wrap: anywhere;
 }
+
 .user-message .message-text {
     padding: 13px 17px;
     border: 1px solid #59416f;
@@ -277,6 +379,7 @@
     color: #77727e;
     font-size: 10px;
 }
+
 .chat-loading,
 .chat-error {
     padding: 16px;
@@ -284,13 +387,13 @@
     font-size: 13px;
     text-align: center;
 }
+
 .chat-error {
     color: #e58e8e;
 }
 
-
 /* =========================================
-   BLOCK 7: MESSAGE COMPOSER
+   BLOCK 8: MESSAGE COMPOSER
 ========================================= */
 
 .chat-footer {
@@ -370,10 +473,8 @@
     justify-content: center;
     width: 36px;
     height: 36px;
-
     border: none;
     border-radius: 10px;
-
     background: #8051a8;
     color: #ffffff;
 }
@@ -389,23 +490,46 @@
 
 .chat-disclaimer {
     margin: 11px 0 0;
-
     color: #77727e;
     font-size: 10px;
-
     text-align: center;
 }
 
-
 /* =========================================
-   BLOCK 8: RESPONSIVE DESIGN
+   BLOCK 9: RESPONSIVE DESIGN
 ========================================= */
 
 @media (max-width: 700px) {
 
     .chat-header {
         min-height: 65px;
-        padding: 0 18px;
+        padding: 10px 18px;
+        gap: 10px;
+    }
+
+    .chat-header-info {
+        gap: 9px;
+    }
+
+    .chat-header-icon {
+        width: 35px;
+        height: 35px;
+    }
+
+    .chat-header-title {
+        font-size: 13px;
+    }
+
+    .model-selector {
+        width: 165px;
+    }
+
+    .model-selector.ant-select .ant-select-selection-item {
+        font-size: 10px;
+    }
+
+    .model-error {
+        max-width: 165px;
     }
 
     .chat-welcome {
@@ -431,5 +555,20 @@
 
     .message-body {
         max-width: 90%;
+    }
+}
+
+@media (max-width: 380px) {
+
+    .chat-header {
+        padding: 10px 12px;
+    }
+
+    .model-selector {
+        width: 135px;
+    }
+
+    .chat-header-icon {
+        display: none;
     }
 }
