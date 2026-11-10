@@ -1,4 +1,4 @@
-# PROJECT_STRUCTURE.md — Monarch AI Bot
+# PROJECT_STRUCTURE.md — Monarch AI Bot (Server)
 
 ---
 
@@ -15,7 +15,7 @@
 
 ## B. Complete Directory Structure
 
-```
+```text
 server/
 ├── APIAuth/
 │   ├── basic_auth.py
@@ -52,11 +52,6 @@ server/
 │   └── get_all_chats.py
 │       └── get_all_chats() — Retrieves all conversations belonging to a user ordered by most recently updated.
 │
-├── Documents/
-│   ├── PROJECT_FLOWS.md
-│   ├── PROJECT_STRUCTURE.md
-│   └── PROMPT.md
-│
 ├── LLM/
 │   ├── groq_chat.py
 │   │   └── groq_chat() — Builds a messages array from history and system prompt, calls Groq chat completions, and returns the generated response with token usage.
@@ -64,6 +59,7 @@ server/
 │   │   ├── format_created_date() — Converts a Unix timestamp into a human-readable UTC date string.
 │   │   └── get_available_models() — Fetches all active models from the Groq API and returns their metadata.
 │   └── prompt.py
+│       └── SYSTEM_PROMPT — System prompt constant defining persona, conciseness, and behavior guidelines.
 │
 ├── .dockerignore
 ├── .env
@@ -82,13 +78,12 @@ server/
 │   ├── user_chat_history() — POST /chat/history handler; retrieves message history for a conversation (requires JWT).
 │   └── user_all_chats() — POST /chats handler; retrieves all conversations for a user (requires JWT).
 ├── pyproject.toml
-├── README.md
 └── uv.lock
 ```
 
 ---
 
-## E. Dependency Overview
+## C. Dependency Overview
 
 ### Backend Dependencies (from `pyproject.toml`)
 
@@ -124,11 +119,11 @@ server/
 
 ### Frontend Dependencies
 
-No frontend application is present in this repository. There are no frontend dependencies.
+The frontend application is maintained independently in the `client/` workspace; there are no frontend dependencies within the server package.
 
 ---
 
-## F. Database Structure
+## D. Database Structure
 
 The database schema is inferred from SQL queries executed across the codebase on **Neon PostgreSQL**.
 
@@ -180,7 +175,7 @@ Stores individual question-answer exchanges within conversations.
 
 ### Relational Schema
 
-```
+```text
 api_active_token (singleton active token record)
 
 users.user_uuid ──< conversations.user_uuid
@@ -207,7 +202,7 @@ No migration scripts exist in the repository; tables are provisioned directly in
 
 ---
 
-## G. API Inventory
+## E. API Inventory
 
 | Method | Endpoint | File | Function | Auth Requirement | Purpose |
 |---|---|---|---|---|---|
@@ -237,7 +232,7 @@ No migration scripts exist in the repository; tables are provisioned directly in
 
 ---
 
-## H. Environment Configuration
+## F. Environment Configuration
 
 | Variable | Purpose | Used By | Required |
 |---|---|---|---|
@@ -249,3 +244,4 @@ No migration scripts exist in the repository; tables are provisioned directly in
 | `JWT_ALGORITHM` | JWT signing algorithm (defaults to `HS256`) | `APIAuth/generate_jwt.py`, `APIAuth/verify_jwt.py` | Optional (default: `HS256`) |
 
 > **Security Note:** Environment variables are loaded via `dotenv` locally and supplied via Render Environment Settings in production. No secret values are hardcoded in the repository.
+

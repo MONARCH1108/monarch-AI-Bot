@@ -1,16 +1,16 @@
-# PROJECT_FLOWS.md — Monarch AI Bot
+# PROJECT_FLOWS.md — Monarch AI Bot (Server)
 
 ---
 
 ## A. Application Overview
 
-Monarch AI Bot is a containerized backend REST API deployed on **Render** that allows authenticated clients to converse with LLM models hosted on **Groq**. Relational data (users, active tokens, conversations, messages) is persisted in **Neon PostgreSQL**. There is no frontend application in this repository.
+Monarch AI Bot is a containerized backend REST API deployed on **Render** that allows authenticated clients to converse with LLM models hosted on **Groq**. Relational data (users, active tokens, conversations, messages) is persisted in **Neon PostgreSQL**.
 
 ### High-Level Architecture Diagram
 
 ```mermaid
 flowchart LR
-    Client["API Client"]
+    Client["API Client / Frontend"]
     Render["Render Web Service<br/>(Docker Container)"]
     FastAPI["FastAPI App<br/>(main.py)"]
     APIAuth["APIAuth Module<br/>(Basic Auth & JWT)"]
@@ -240,7 +240,7 @@ sequenceDiagram
 
 ### 1. Inbound Request Protection via JWT Dependency
 
-```
+```text
 Inbound HTTP Request to Protected Endpoint
   │
   ▼
@@ -264,7 +264,7 @@ FastAPI Dependency: require_jwt() in main.py
 
 ### 2. Token Creation Flow
 
-```
+```text
 Client
   │  POST /token (Authorization: Basic base64(username:password))
   ▼
@@ -286,7 +286,7 @@ main.py :: create_access_token()
 
 ### 3. Chat Message Execution Flow
 
-```
+```text
 Client
   │  POST /chat (Authorization: Bearer <token>) {user_uuid, model, message, chat_id?}
   ▼
@@ -493,7 +493,7 @@ sequenceDiagram
 
 ```mermaid
 flowchart TD
-    Client["API Client"]
+    Client["API Client / Frontend"]
     FastAPI["FastAPI (main.py)"]
     APIAuth["APIAuth (Basic Auth & JWT)"]
     Auth["auth/ (User Registry)"]
@@ -543,7 +543,7 @@ flowchart TD
 
 ### Layered Error Architecture
 
-```
+```text
 HTTP Request
      │
      ▼
@@ -584,3 +584,4 @@ HTTP Request
 - Docker execution corresponds to `server/Dockerfile` using Python 3.14-slim, uv, and Uvicorn.
 - Render web service deployment serves the application at port 8000 with `/health` endpoint checks.
 - Dual-tier authentication logic matches `APIAuth/basic_auth.py`, `APIAuth/generate_jwt.py`, `APIAuth/token_database.py`, and `APIAuth/verify_jwt.py`.
+
