@@ -455,3 +455,35 @@
 .sidebar .ant-wave {
     display: none !important;
 }
+
+/* =========================================
+   BLOCK 10 — BRIGHT WHITE CHAT TEXT
+========================================= */
+
+/* Recent chat text */
+.sidebar-chat-history .ant-menu-item,
+.sidebar-chat-history .ant-menu-item .ant-menu-title-content {
+    color: #ffffff !important;
+}
+
+/* Chat icons */
+.sidebar-chat-history .ant-menu-item .ant-menu-item-icon {
+    color: #ffffff !important;
+}
+
+/* Hover */
+.sidebar-chat-history .ant-menu-item:hover,
+.sidebar-chat-history .ant-menu-item:hover .ant-menu-title-content {
+    color: #ffffff !important;
+}
+
+/* Selected chat */
+.sidebar-chat-history .ant-menu-item-selected,
+.sidebar-chat-history .ant-menu-item-selected .ant-menu-title-content {
+    color: #ffffff !important;
+}
+
+/* Chat history loading and empty messages */
+.chat-history-message {
+    color: #ffffff !important;
+}

@@ -51,11 +51,9 @@ function getAccountExpiry(user) {
         return null;
     }
 
-    const expiryTime = new Date(
+    return new Date(
         createdAt.getTime() + 24 * 60 * 60 * 1000
     );
-
-    return expiryTime;
 }
 
 function ControlPanel({ user = null, onLogout }) {
@@ -166,19 +164,19 @@ function ControlPanel({ user = null, onLogout }) {
                                 ))}
                             </div>
 
-                            {/* BLOCK 4: LOGOUT */}
-                            <div className="control-panel-logout">
-                                <Button
-                                    danger
-                                    block
-                                    icon={<LogoutOutlined />}
-                                    onClick={onLogout}
-                                    disabled={!onLogout}
-                                >
-                                    Logout
-                                </Button>
-                            </div>
+                        </div>
 
+                        {/* BLOCK 4: FIXED BOTTOM LOGOUT */}
+                        <div className="control-panel-logout-footer">
+                            <Button
+                                danger
+                                block
+                                icon={<LogoutOutlined />}
+                                onClick={onLogout}
+                                disabled={!onLogout}
+                            >
+                                Logout
+                            </Button>
                         </div>
                     </>
                 )}

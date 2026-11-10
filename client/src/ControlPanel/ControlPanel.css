@@ -1,3 +1,4 @@
+
 /* =========================================
    BLOCK 1 — CONTROL PANEL BASE
 ========================================= */
@@ -34,7 +35,6 @@
     overflow: hidden;
 }
 
-
 /* =========================================
    BLOCK 2 — PANEL CONTAINER
 ========================================= */
@@ -52,7 +52,7 @@
 }
 
 /* =========================================
-   BLOCK 3: PANEL HEADER
+   BLOCK 3 — PANEL HEADER
 ========================================= */
 
 .control-panel-header {
@@ -89,14 +89,14 @@
 }
 
 /* =========================================
-   BLOCK 4: PANEL NAVIGATION
+   BLOCK 4 — PANEL NAVIGATION
 ========================================= */
 
 .control-panel-navigation {
     display: flex;
     gap: 6px;
 
-    padding: 12px 12px;
+    padding: 12px;
 
     border-bottom: 1px solid rgba(255, 255, 255, 0.09);
 }
@@ -142,9 +142,8 @@
     border: 1px solid rgba(183, 145, 225, 0.25);
 }
 
-
 /* =========================================
-   BLOCK 5: PANEL CONTENT
+   BLOCK 5 — PANEL CONTENT
 ========================================= */
 
 .control-panel-content {
@@ -159,9 +158,8 @@
     color: #ffffff;
 }
 
-
 /* =========================================
-   BLOCK 6: SECTION HEADING
+   BLOCK 6 — SECTION HEADING
 ========================================= */
 
 .control-panel-section-heading {
@@ -182,9 +180,8 @@
     font-size: 16px;
 }
 
-
 /* =========================================
-   BLOCK 7: PROFILE DETAILS
+   BLOCK 7 — PROFILE DETAILS
 ========================================= */
 
 .profile-details {
@@ -240,9 +237,8 @@
     overflow-wrap: anywhere;
 }
 
-
 /* =========================================
-   BLOCK 8: ACCOUNT PLACEHOLDER
+   BLOCK 8 — ACCOUNT PLACEHOLDER
 ========================================= */
 
 .account-placeholder {
@@ -282,9 +278,8 @@
     margin: 0;
 }
 
-
 /* =========================================
-   BLOCK 9: SCROLLBAR
+   BLOCK 9 — SCROLLBAR
 ========================================= */
 
 .control-panel-content::-webkit-scrollbar {
@@ -304,9 +299,8 @@
     background: rgba(255, 255, 255, 0.3);
 }
 
-
 /* =========================================
-   BLOCK 10: COLLAPSED PANEL
+   BLOCK 10 — COLLAPSED PANEL
 ========================================= */
 
 .control-panel.ant-layout-sider {
@@ -333,7 +327,7 @@
 }
 
 /* =========================================
-   BLOCK 11: RESPONSIVE
+   BLOCK 11 — RESPONSIVE
 ========================================= */
 
 @media (max-width: 768px) {
@@ -352,29 +346,61 @@
     background: transparent !important;
 }
 
-/* LOGOUT BUTTON */
-.control-panel-logout {
-    margin-top: 24px;
-    padding-top: 16px;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
+
+/* =========================================
+   BLOCK 13 — FIXED BOTTOM LOGOUT
+========================================= */
+
+/* Keep the panel as a full-height flex container */
+.control-panel-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
 }
 
-.control-panel-logout .ant-btn {
-    height: 38px;
-    border-radius: 8px;
+/* Profile content takes available space and scrolls independently */
+.control-panel-content {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* Logout stays at the bottom of the panel */
+.control-panel-logout-footer {
+    flex: 0 0 auto;
+    margin-top: auto;
+    padding: 16px 14px 20px;
+
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    background: transparent;
+}
+
+/* Logout button appearance */
+.control-panel-logout-footer .ant-btn {
+    height: 40px;
+    border-radius: 9px;
+
     font-size: 12.5px;
     font-weight: 500;
+
+    color: #e58e8e !important;
+    border-color: rgba(229, 142, 142, 0.25) !important;
+    background: rgba(180, 65, 65, 0.08) !important;
+
     transition: all 0.2s ease;
 }
 
-.control-panel-logout .ant-btn-dangerous {
-    color: #e58e8e;
-    border-color: rgba(229, 142, 142, 0.25);
-    background: rgba(180, 65, 65, 0.08);
-}
-
-.control-panel-logout .ant-btn-dangerous:hover {
-    color: #fff !important;
+/* Logout hover */
+.control-panel-logout-footer .ant-btn:hover {
+    color: #ffffff !important;
     border-color: #c75b65 !important;
     background: rgba(180, 65, 65, 0.2) !important;
+}
+
+/* Keep footer hidden when the panel is collapsed */
+.control-panel.ant-layout-sider-collapsed
+.control-panel-logout-footer {
+    display: none;
 }
