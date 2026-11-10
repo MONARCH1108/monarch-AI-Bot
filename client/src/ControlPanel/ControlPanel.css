@@ -56,23 +56,24 @@
 ========================================= */
 
 .control-panel-header {
-    min-height: 72px;
+    min-height: 64px;
 
     display: flex;
     align-items: center;
     justify-content: flex-start;
 
-    padding: 0 18px;
+    padding: 0 16px;
 
     border-bottom: 1px solid rgba(255, 255, 255, 0.09);
 }
 
 .control-panel-header .ant-btn {
     color: #ffffff !important;
-    font-size: 19px;
+    font-size: 18px;
 
-    width: 38px;
-    height: 38px;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
 
     transition: all 0.25s ease;
 }
@@ -93,9 +94,9 @@
 
 .control-panel-navigation {
     display: flex;
-    gap: 8px;
+    gap: 6px;
 
-    padding: 14px 14px;
+    padding: 12px 12px;
 
     border-bottom: 1px solid rgba(255, 255, 255, 0.09);
 }
@@ -103,16 +104,16 @@
 .control-panel-tab {
     flex: 1;
     min-width: 0;
-    height: 44px;
+    height: 38px;
 
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 9px;
+    gap: 8px;
 
-    color: rgba(255, 255, 255, 0.65) !important;
+    color: rgba(255, 255, 255, 0.60) !important;
 
-    font-size: 15px;
+    font-size: 13px;
     font-weight: 500;
 
     border-radius: 8px !important;
@@ -121,7 +122,7 @@
 }
 
 .control-panel-tab .anticon {
-    font-size: 16px;
+    font-size: 14px;
 }
 
 .control-panel-tab:hover {
@@ -150,7 +151,7 @@
     flex: 1;
     min-height: 0;
 
-    padding: 24px 18px;
+    padding: 20px 14px;
 
     overflow-y: auto;
     overflow-x: hidden;
@@ -166,19 +167,19 @@
 .control-panel-section-heading {
     display: flex;
     align-items: center;
-    gap: 11px;
+    gap: 10px;
 
-    margin-bottom: 22px;
+    margin-bottom: 18px;
 
     color: #ffffff;
 
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 600;
 }
 
 .control-panel-section-heading .anticon {
     color: #c3a0ed;
-    font-size: 18px;
+    font-size: 16px;
 }
 
 
@@ -189,51 +190,53 @@
 .profile-details {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
 }
 
 .profile-detail-item {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
 
-    padding: 15px;
+    padding: 12px;
 
-    background: rgba(255, 255, 255, 0.035);
+    background: rgba(255, 255, 255, 0.03);
 
-    border: 1px solid rgba(255, 255, 255, 0.09);
-    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 9px;
 
     transition: all 0.25s ease;
 }
 
 .profile-detail-item:hover {
-    background: rgba(255, 255, 255, 0.065);
-    border-color: rgba(183, 145, 225, 0.3);
+    background: rgba(255, 255, 255, 0.055);
+    border-color: rgba(183, 145, 225, 0.25);
 }
 
 .profile-detail-label {
     display: flex;
     align-items: center;
-    gap: 9px;
+    gap: 8px;
 
-    color: rgba(255, 255, 255, 0.62);
+    color: rgba(255, 255, 255, 0.55);
 
-    font-size: 13px;
+    font-size: 11px;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
 }
 
 .profile-detail-icon {
     color: #c3a0ed;
-    font-size: 15px;
+    font-size: 13px;
 }
 
 .profile-detail-value {
-    color: #ffffff;
+    color: #f0ecf4;
 
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
 
-    line-height: 1.6;
+    line-height: 1.5;
     overflow-wrap: anywhere;
 }
 

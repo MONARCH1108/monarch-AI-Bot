@@ -41,7 +41,7 @@
     height: 100%;
     min-height: 0;
 
-    padding: 12px;
+    padding: 10px;
     overflow: hidden;
 
     transition: padding 500ms cubic-bezier(0.22, 1, 0.36, 1);
@@ -59,13 +59,13 @@
     justify-content: center;
 
     width: 100%;
-    min-height: 125px;
+    min-height: 110px;
 
-    margin-bottom: 16px;
-    padding: 10px;
+    margin-bottom: 12px;
+    padding: 8px;
 
     background: #000000;
-    border-radius: 8px;
+    border-radius: 10px;
 }
 
 .sidebar-brand {
@@ -80,8 +80,8 @@
 .sidebar-logo {
     display: block;
 
-    width: 155px;
-    height: 105px;
+    width: 140px;
+    height: 95px;
 
     object-fit: contain;
     object-position: center;
@@ -121,6 +121,7 @@
 .sidebar-header-actions .ant-btn:hover {
     color: #d2a5ff !important;
     background: rgba(255, 255, 255, 0.10) !important;
+    border-radius: 8px;
 }
 
 
@@ -144,21 +145,29 @@
     color: #eeeeF2 !important;
     font-size: 12px;
     font-weight: 500;
+    letter-spacing: 0.3px;
 
     background: transparent !important;
 
-    border: 1px solid rgba(178, 126, 255, 0.65) !important;
+    border: 1px solid rgba(178, 126, 255, 0.50) !important;
     border-radius: 9px;
 
     box-shadow: none !important;
+    transition: all 0.25s ease;
 }
 
 .sidebar-new-chat .new-chat-button:hover {
     color: #ffffff !important;
 
-    background: rgba(178, 126, 255, 0.09) !important;
+    background: rgba(178, 126, 255, 0.12) !important;
 
     border-color: #c28cff !important;
+    box-shadow: 0 0 16px rgba(178, 126, 255, 0.10) !important;
+    transform: translateY(-1px);
+}
+
+.sidebar-new-chat .new-chat-button:active {
+    transform: translateY(0);
 }
 
 .sidebar-new-chat .new-chat-button .anticon {
@@ -203,6 +212,8 @@
     background: transparent !important;
 
     border-radius: 7px !important;
+
+    transition: all 0.2s ease;
 }
 
 .sidebar .ant-menu-item .ant-menu-item-icon {
@@ -228,7 +239,8 @@
 .sidebar .ant-menu-item-selected,
 .sidebar .ant-menu-dark .ant-menu-item-selected {
     color: #eeeeF2 !important;
-    background: rgba(255, 255, 255, 0.09) !important;
+    background: rgba(178, 126, 255, 0.10) !important;
+    border-left: 2px solid #b27eff;
 }
 
 .sidebar .ant-menu-item-selected .ant-menu-item-icon {
@@ -282,7 +294,15 @@
 
     font-size: 10px;
     font-weight: 600;
-    letter-spacing: 0.4px;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+}
+
+.chat-history-message {
+    padding: 12px 9px;
+    color: #7a7a84;
+    font-size: 11px;
+    line-height: 1.5;
 }
 
 .sidebar-chat-history .ant-menu-item {
@@ -296,7 +316,7 @@
 
 .sidebar-chat-history .ant-menu-item-selected {
     color: #eeeeF2 !important;
-    background: rgba(255, 255, 255, 0.09) !important;
+    background: rgba(178, 126, 255, 0.10) !important;
 }
 
 /* Chat history scrollbar */
@@ -330,12 +350,18 @@
     gap: 10px;
 
     width: 100%;
-    min-height: 48px;
+    min-height: 46px;
 
-    padding: 9px 3px 2px;
-    margin-top: 10px;
+    padding: 8px 6px 4px;
+    margin-top: 8px;
 
     border-top: 1px solid rgba(255, 255, 255, 0.09);
+    transition: background 0.2s ease;
+    border-radius: 8px;
+}
+
+.sidebar-user:hover {
+    background: rgba(255, 255, 255, 0.03);
 }
 
 .sidebar-user .ant-avatar {
