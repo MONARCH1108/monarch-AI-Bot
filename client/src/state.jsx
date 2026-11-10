@@ -12,36 +12,98 @@ import {
 } from "./ChatArea/chatApi";
 
 const DEFAULT_MODEL = "openai/gpt-oss-20b";
+const SESSION_STORAGE_KEY = "monarch_ai_session";
+
+// BLOCK 1: READ SAVED SESSION
+const getSavedSession = () => {
+
+    try {
+        const savedSession = localStorage.getItem(SESSION_STORAGE_KEY);
+
+        if (!savedSession) return {};
+
+        const parsedSession = JSON.parse(savedSession);
+
+        return {
+            user: parsedSession.user || null,
+            selectedChatId: parsedSession.selectedChatId || null,
+            selectedModel: parsedSession.selectedModel || DEFAULT_MODEL
+        };
+
+    } catch (error) {
+        console.error("Unable to restore saved session:", error);
+        return {};
+    }
+};
+
+// BLOCK 2: CHECK AUTHENTICATION ERRORS
+const isAuthenticationError = (error) => {
+    return error.status === 401 || error.status === 403;
+};
 
 function useAppState() {
 
-    // BLOCK 1: USER AUTHENTICATION STATE
-    const [user, setUser] = useState(null);
+    // BLOCK 3: INITIALIZE SAVED SESSION
+    const [initialSession] = useState(getSavedSession);
 
-    // BLOCK 2: CONVERSATION STATES
+    // BLOCK 4: USER AUTHENTICATION STATE
+    const [user, setUser] = useState(initialSession.user);
+
+    // BLOCK 5: CONVERSATION STATES
     const [conversations, setConversations] = useState([]);
-    const [selectedChatId, setSelectedChatId] = useState(null);
+
+    const [selectedChatId, setSelectedChatId] = useState(
+        initialSession.selectedChatId
+    );
 
     const [chatsLoading, setChatsLoading] = useState(false);
     const [chatsError, setChatsError] = useState("");
 
-    // BLOCK 3: CHAT HISTORY STATES
+    // BLOCK 6: CHAT HISTORY STATES
     const [chatHistory, setChatHistory] = useState([]);
     const [historyLoading, setHistoryLoading] = useState(false);
     const [historyError, setHistoryError] = useState("");
 
-    // BLOCK 4: MESSAGE SENDING STATE
+    // BLOCK 7: MESSAGE SENDING STATE
     const [sending, setSending] = useState(false);
     const [sendingError, setSendingError] = useState("");
 
-    // BLOCK 5: MODEL STATES
+    // BLOCK 8: MODEL STATES
     const [availableModels, setAvailableModels] = useState([]);
-    const [selectedModel, setSelectedModel] = useState(DEFAULT_MODEL);
+
+    const [selectedModel, setSelectedModel] = useState(
+        initialSession.selectedModel
+    );
 
     const [modelsLoading, setModelsLoading] = useState(false);
     const [modelsError, setModelsError] = useState("");
 
-    // BLOCK 6: FETCH AVAILABLE MODELS
+    // BLOCK 9: PERSIST APPLICATION SESSION
+    useEffect(() => {
+
+        if (!user) {
+            localStorage.removeItem(SESSION_STORAGE_KEY);
+            return;
+        }
+
+        const session = {
+            user,
+            selectedChatId,
+            selectedModel
+        };
+
+        try {
+            localStorage.setItem(
+                SESSION_STORAGE_KEY,
+                JSON.stringify(session)
+            );
+        } catch (error) {
+            console.error("Unable to save session:", error);
+        }
+
+    }, [user, selectedChatId, selectedModel]);
+
+    // BLOCK 10: FETCH AVAILABLE MODELS
     useEffect(() => {
 
         const controller = new AbortController();
@@ -59,27 +121,28 @@ function useAppState() {
 
                 if (controller.signal.aborted) return;
 
-                const activeModels = response.models.filter(
-                    (model) => model.active
+                // Keep every model returned by the API.
+                const allModels = response.models || [];
+
+                setAvailableModels(allModels);
+
+                const selectedModelExists = allModels.some(
+                    (model) => model.id === selectedModel
                 );
 
-                setAvailableModels(activeModels);
+                if (!selectedModelExists) {
 
-                const defaultModelExists = activeModels.some(
-                    (model) => model.id === DEFAULT_MODEL
-                );
+                    const defaultModelExists = allModels.some(
+                        (model) => model.id === DEFAULT_MODEL
+                    );
 
-                if (defaultModelExists) {
-
-                    setSelectedModel(DEFAULT_MODEL);
-
-                } else if (activeModels.length > 0) {
-
-                    setSelectedModel(activeModels[0].id);
-
-                } else {
-
-                    setModelsError("No active models are available.");
+                    if (defaultModelExists) {
+                        setSelectedModel(DEFAULT_MODEL);
+                    } else if (allModels.length > 0) {
+                        setSelectedModel(allModels[0].id);
+                    } else {
+                        setModelsError("No models are available.");
+                    }
                 }
 
             } catch (error) {
@@ -106,8 +169,28 @@ function useAppState() {
 
     }, []);
 
-    // BLOCK 7: AUTHENTICATION SUCCESS
-    const handleAuthenticated = async (userData) => {
+    // BLOCK 11: CLEAR EXPIRED SESSION
+    const handleSessionExpired = () => {
+
+        localStorage.removeItem(SESSION_STORAGE_KEY);
+
+        setUser(null);
+
+        setConversations([]);
+        setSelectedChatId(null);
+        setChatHistory([]);
+
+        setChatsError("");
+        setHistoryError("");
+        setSendingError("");
+
+        setChatsLoading(false);
+        setHistoryLoading(false);
+        setSending(false);
+    };
+
+    // BLOCK 12: AUTHENTICATION SUCCESS
+    const handleAuthenticated = (userData) => {
 
         setUser(userData);
 
@@ -119,26 +202,76 @@ function useAppState() {
         setHistoryError("");
         setSendingError("");
 
-        setChatsLoading(true);
-
-        try {
-
-            const response = await getAllChats(userData.user_uuid);
-
-            setConversations(response.conversations || []);
-
-        } catch (error) {
-
-            setChatsError(
-                error.message || "Unable to load conversations."
-            );
-
-        } finally {
-            setChatsLoading(false);
-        }
+        setChatsLoading(false);
+        setHistoryLoading(false);
+        setSending(false);
     };
+ 
+    // BLOCK 13: RESTORE / FETCH CONVERSATIONS
+    useEffect(() => {
 
-    // BLOCK 8: HANDLE NEW CHAT
+        if (!user?.user_uuid) {
+            setConversations([]);
+            setChatsLoading(false);
+            return;
+        }
+
+        const controller = new AbortController();
+
+        const fetchChats = async () => {
+
+            setChatsLoading(true);
+            setChatsError("");
+
+            try {
+
+                const response = await getAllChats(
+                    user.user_uuid,
+                    controller.signal
+                );
+
+                if (controller.signal.aborted) return;
+
+                setConversations(response.conversations || []);
+
+            } catch (error) {
+
+                if (controller.signal.aborted) return;
+
+                if (isAuthenticationError(error)) {
+                    handleSessionExpired();
+                    return;
+                }
+
+                setChatsError(
+                    error.message || "Unable to load conversations."
+                );
+
+            } finally {
+
+                if (!controller.signal.aborted) {
+                    setChatsLoading(false);
+                }
+            }
+        };
+
+        // Allow StrictMode's initial cleanup to finish
+        // before starting the API request.
+        const requestTimer = setTimeout(() => {
+            if (!controller.signal.aborted) {
+                fetchChats();
+            }
+        }, 0);
+
+        return () => {
+            clearTimeout(requestTimer);
+            controller.abort();
+        };
+
+    }, [user?.user_uuid]);
+
+
+    // BLOCK 14: HANDLE NEW CHAT
     const handleNewChat = () => {
 
         setSelectedChatId(null);
@@ -147,10 +280,9 @@ function useAppState() {
         setHistoryError("");
         setSendingError("");
         setHistoryLoading(false);
-        setSending(false);
     };
 
-    // BLOCK 9: HANDLE CONVERSATION SELECTION
+    // BLOCK 15: HANDLE CONVERSATION SELECTION
     const handleSelectChat = (chatId) => {
 
         if (chatId === selectedChatId) return;
@@ -162,7 +294,7 @@ function useAppState() {
         setSendingError("");
     };
 
-    // BLOCK 10: FETCH CHAT HISTORY WHEN SELECTION CHANGES
+    // BLOCK 16: FETCH CHAT HISTORY WHEN SELECTION CHANGES
     useEffect(() => {
 
         if (!user?.user_uuid || !selectedChatId) {
@@ -196,6 +328,11 @@ function useAppState() {
 
                 if (controller.signal.aborted) return;
 
+                if (isAuthenticationError(error)) {
+                    handleSessionExpired();
+                    return;
+                }
+
                 setHistoryError(
                     error.message ||
                     "Unable to load conversation history."
@@ -217,7 +354,7 @@ function useAppState() {
 
     }, [user?.user_uuid, selectedChatId]);
 
-    // BLOCK 11: SEND CHAT MESSAGE
+    // BLOCK 17: SEND CHAT MESSAGE
     const handleSendMessage = async (message) => {
 
         if (!user?.user_uuid) {
@@ -238,19 +375,21 @@ function useAppState() {
         setSendingError("");
         setHistoryError("");
 
-        // Keep the selected conversation captured for this request.
+        // Capture the current conversation and model.
         const currentChatId = selectedChatId;
+        const currentModel = selectedModel;
+        const currentUser = user;
 
         try {
 
             const response = await sendChatMessage({
-                user_uuid: user.user_uuid,
+                user_uuid: currentUser.user_uuid,
                 chat_id: currentChatId,
-                model: selectedModel,
+                model: currentModel,
                 message
             });
 
-            // BLOCK 12: NORMALIZE API RESPONSE
+            // BLOCK 18: NORMALIZE API RESPONSE
             const returnedChatId =
                 response.chat_id ||
                 response.data?.chat_id ||
@@ -274,16 +413,16 @@ function useAppState() {
                 );
             }
 
-            // BLOCK 13: UPDATE SELECTED CONVERSATION
+            // BLOCK 19: UPDATE SELECTED CONVERSATION
             if (currentChatId !== returnedChatId) {
                 setSelectedChatId(returnedChatId);
             }
 
-            // BLOCK 14: UPDATE CHAT HISTORY
+            // BLOCK 20: UPDATE CHAT HISTORY
             const newMessage = {
                 question: message,
                 answer,
-                model: response.model || selectedModel,
+                model: response.model || currentModel,
                 created_at: response.created_at || new Date().toISOString()
             };
 
@@ -292,14 +431,21 @@ function useAppState() {
                 newMessage
             ]);
 
-            // BLOCK 15: REFRESH SIDEBAR CONVERSATIONS
-            const chatsResponse = await getAllChats(user.user_uuid);
+            // BLOCK 21: REFRESH SIDEBAR CONVERSATIONS
+            const chatsResponse = await getAllChats(
+                currentUser.user_uuid
+            );
 
             setConversations(chatsResponse.conversations || []);
 
             return true;
 
         } catch (error) {
+
+            if (isAuthenticationError(error)) {
+                handleSessionExpired();
+                return false;
+            }
 
             setSendingError(
                 error.message || "Unable to send your message."
@@ -312,7 +458,31 @@ function useAppState() {
         }
     };
 
-    // BLOCK 16: SELECTED CONVERSATION DETAILS
+    // BLOCK 22: LOGOUT
+    const handleLogout = () => {
+
+        // Remove the persisted session immediately.
+        localStorage.removeItem(SESSION_STORAGE_KEY);
+
+        setUser(null);
+
+        setConversations([]);
+        setSelectedChatId(null);
+        setChatHistory([]);
+
+        setChatsError("");
+        setHistoryError("");
+        setSendingError("");
+
+        setChatsLoading(false);
+        setHistoryLoading(false);
+        setSending(false);
+
+        // Reset model selection.
+        setSelectedModel(DEFAULT_MODEL);
+    };
+
+    // BLOCK 23: SELECTED CONVERSATION DETAILS
     const selectedConversation = conversations.find(
         (chat) => chat.chat_id === selectedChatId
     );
@@ -327,7 +497,7 @@ function useAppState() {
             : null
     );
 
-    // BLOCK 17: EXPOSE APPLICATION STATE
+    // BLOCK 24: EXPOSE APPLICATION STATE
     return {
         user,
 
@@ -355,7 +525,8 @@ function useAppState() {
         handleAuthenticated,
         handleNewChat,
         handleSelectChat,
-        handleSendMessage
+        handleSendMessage,
+        handleLogout
     };
 }
 
