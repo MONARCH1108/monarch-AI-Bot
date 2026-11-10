@@ -31,7 +31,12 @@ function App() {
         modelsLoading,
         modelsError,
         selectedChatTitle,
+
+        // AUTHENTICATION HANDLERS
         handleAuthenticated,
+        handleLogout,
+
+        // CHAT HANDLERS
         handleSelectChat,
         handleNewChat,
         handleSendMessage
@@ -50,6 +55,7 @@ function App() {
     return (
         <div className="app-container">
             <Layout className="workspace-layout">
+
                 {/* BLOCK 1: LEFT SIDEBAR */}
                 <Sidebar
                     user={user}
@@ -71,7 +77,7 @@ function App() {
                         error={historyError || sendingError}
                         onSend={handleSendMessage}
 
-                        // MODEL SELECTOR PROPS
+    
                         availableModels={availableModels}
                         selectedModel={selectedModel}
                         onModelChange={setSelectedModel}
@@ -83,7 +89,9 @@ function App() {
                 {/* BLOCK 3: RIGHT CONTROL PANEL */}
                 <ControlPanel
                     user={user}
+                    onLogout={handleLogout}
                 />
+
             </Layout>
         </div>
     );

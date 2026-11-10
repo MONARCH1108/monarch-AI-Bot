@@ -35,7 +35,6 @@ function ChatArea({
     modelsLoading = false,
     modelsError = ""
 }) {
-
     const [message, setMessage] = useState("");
 
     // BLOCK 1: HANDLE MESSAGE INPUT
@@ -47,7 +46,14 @@ function ChatArea({
     const handleSendMessage = async () => {
         const cleanMessage = message.trim();
 
-        if (!cleanMessage || !onSend || sending || loading) {
+        if (
+            !cleanMessage ||
+            !onSend ||
+            sending ||
+            loading ||
+            modelsLoading ||
+            !selectedModel
+        ) {
             return;
         }
 
@@ -66,10 +72,7 @@ function ChatArea({
 
     // BLOCK 3: HANDLE ENTER KEY
     const handleKeyDown = (event) => {
-        if (
-            event.key === "Enter" &&
-            !event.shiftKey
-        ) {
+        if (event.key === "Enter" && !event.shiftKey) {
             event.preventDefault();
             handleSendMessage();
         }
@@ -110,12 +113,16 @@ function ChatArea({
     const showWelcomeScreen =
         !chatTitle && messages.length === 0;
 
+    // BLOCK 7: MODEL SELECTOR PLACEHOLDER
+    const modelPlaceholder = modelsLoading
+        ? "Loading models..."
+        : "Choose your LLM model";
+
     return (
         <div className="chat-area">
 
             {/* BLOCK 1: CHAT HEADER */}
             <header className="chat-header">
-
                 <div className="chat-header-info">
 
                     <div className="chat-header-icon">
@@ -123,7 +130,6 @@ function ChatArea({
                     </div>
 
                     <div className="chat-header-details">
-
                         <span className="chat-header-title">
                             {chatTitle || "Monarch AI"}
                         </span>
@@ -132,57 +138,17 @@ function ChatArea({
                             <span className="status-indicator" />
                             AI Assistant
                         </span>
-
                     </div>
 
                 </div>
-
-                {/* BLOCK 2: DYNAMIC MODEL SELECTOR */}
-                <div className="model-selector-container">
-
-                    <Select
-                        className="model-selector"
-                        placeholder={
-                            modelsLoading
-                                ? "Loading models..."
-                                : "Select a model"
-                        }
-                        value={selectedModel || undefined}
-                        options={modelOptions}
-                        onChange={onModelChange}
-                        loading={modelsLoading}
-                        disabled={
-                            modelsLoading ||
-                            availableModels.length === 0
-                        }
-                        showSearch
-                        optionFilterProp="label"
-                        notFoundContent={
-                            modelsLoading
-                                ? "Loading models..."
-                                : modelsError || "No models available"
-                        }
-                        popupMatchSelectWidth={false}
-                        listHeight={300}
-                        title={selectedModel || ""}
-                    />
-
-                    {modelsError && (
-                        <span className="model-error">
-                            {modelsError}
-                        </span>
-                    )}
-
-                </div>
-
             </header>
 
-            {/* BLOCK 3: CHAT MESSAGE CONTAINER */}
+            {/* BLOCK 2: CHAT MESSAGE CONTAINER */}
             <main className="chat-content">
 
                 {showWelcomeScreen ? (
 
-                    /* BLOCK 4: WELCOME SCREEN */
+                    /* BLOCK 3: WELCOME SCREEN */
                     <div className="chat-welcome">
 
                         <div className="welcome-icon">
@@ -199,19 +165,16 @@ function ChatArea({
                         </p>
 
                         <div className="suggestion-grid">
-
                             {suggestions.map((item) => (
                                 <div
                                     className="suggestion-card"
                                     key={item.title}
                                 >
-
                                     <div className="suggestion-icon">
                                         {item.icon}
                                     </div>
 
                                     <div className="suggestion-content">
-
                                         <span className="suggestion-title">
                                             {item.title}
                                         </span>
@@ -219,19 +182,16 @@ function ChatArea({
                                         <span className="suggestion-description">
                                             {item.description}
                                         </span>
-
                                     </div>
-
                                 </div>
                             ))}
-
                         </div>
 
                     </div>
 
                 ) : (
 
-                    /* BLOCK 5: CONVERSATION MESSAGES */
+                    /* BLOCK 4: CONVERSATION MESSAGES */
                     <div className="chat-messages">
 
                         {loading && (
@@ -257,7 +217,6 @@ function ChatArea({
                         {!loading &&
                             !error &&
                             messages.map((item, index) => (
-
                                 <div
                                     className="message-pair"
                                     key={`${item.created_at || "message"}-${index}`}
@@ -267,7 +226,6 @@ function ChatArea({
                                     <div className="message-row user-message">
 
                                         <div className="message-body">
-
                                             <div className="message-role">
                                                 You
                                             </div>
@@ -275,7 +233,6 @@ function ChatArea({
                                             <div className="message-text">
                                                 {item.question}
                                             </div>
-
                                         </div>
 
                                         <Avatar
@@ -300,12 +257,15 @@ function ChatArea({
                                             </div>
 
                                             <div className="message-text markdown-content">
-
                                                 <ReactMarkdown
                                                     remarkPlugins={[remarkGfm]}
                                                     rehypePlugins={[rehypeHighlight]}
                                                     components={{
-                                                        a: ({ href, children, ...props }) => (
+                                                        a: ({
+                                                            href,
+                                                            children,
+                                                            ...props
+                                                        }) => (
                                                             <a
                                                                 href={href}
                                                                 target="_blank"
@@ -319,7 +279,6 @@ function ChatArea({
                                                 >
                                                     {item.answer || ""}
                                                 </ReactMarkdown>
-
                                             </div>
 
                                             {item.model && (
@@ -329,14 +288,12 @@ function ChatArea({
                                             )}
 
                                         </div>
-
                                     </div>
 
                                 </div>
-
                             ))}
 
-                        {/* BLOCK 6: SENDING INDICATOR */}
+                        {/* BLOCK 5: SENDING INDICATOR */}
                         {sending && (
                             <div className="chat-loading">
                                 Monarch AI is thinking...
@@ -344,16 +301,58 @@ function ChatArea({
                         )}
 
                     </div>
-
                 )}
 
             </main>
 
-            {/* BLOCK 7: MESSAGE COMPOSER */}
+            {/* BLOCK 6: MESSAGE COMPOSER */}
             <footer className="chat-footer">
 
                 <div className="message-composer">
 
+                    {/* BLOCK 7: MODEL SELECTION */}
+                    <div className="composer-model-section">
+
+                        <label
+                            className="composer-model-label"
+                            htmlFor="monarch-model-selector"
+                        >
+                            Choose your LLM model
+                        </label>
+
+                        <Select
+                            id="monarch-model-selector"
+                            className="model-selector"
+                            placeholder={modelPlaceholder}
+                            value={selectedModel || undefined}
+                            options={modelOptions}
+                            onChange={onModelChange}
+                            loading={modelsLoading}
+                            disabled={
+                                modelsLoading ||
+                                availableModels.length === 0
+                            }
+                            showSearch
+                            optionFilterProp="label"
+                            notFoundContent={
+                                modelsLoading
+                                    ? "Loading models..."
+                                    : modelsError || "No models available"
+                            }
+                            popupMatchSelectWidth={true}
+                            listHeight={300}
+                            title={selectedModel || ""}
+                        />
+
+                        {modelsError && (
+                            <span className="model-error">
+                                {modelsError}
+                            </span>
+                        )}
+
+                    </div>
+
+                    {/* BLOCK 8: MESSAGE INPUT */}
                     <TextArea
                         className="message-input"
                         placeholder="Message Monarch AI..."
@@ -367,6 +366,7 @@ function ChatArea({
                         disabled={sending || loading}
                     />
 
+                    {/* BLOCK 9: COMPOSER ACTIONS */}
                     <div className="composer-actions">
 
                         <div className="composer-tools">
@@ -383,7 +383,9 @@ function ChatArea({
                                 !message.trim() ||
                                 !onSend ||
                                 sending ||
-                                loading
+                                loading ||
+                                modelsLoading ||
+                                !selectedModel
                             }
                         />
 

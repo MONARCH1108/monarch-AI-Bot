@@ -7,7 +7,8 @@ import {
     UserOutlined,
     IdcardOutlined,
     CalendarOutlined,
-    ClockCircleOutlined
+    ClockCircleOutlined,
+    LogoutOutlined
 } from "@ant-design/icons";
 import "./ControlPanel.css";
 
@@ -16,10 +17,13 @@ const { Sider } = Layout;
 // BLOCK 1: FORMAT DATE AND TIME
 function formatDateTime(dateValue) {
     if (!dateValue) return "Not available";
+
     const date = new Date(dateValue);
+
     if (Number.isNaN(date.getTime())) {
         return "Not available";
     }
+
     return new Intl.DateTimeFormat("en-IN", {
         day: "2-digit",
         month: "short",
@@ -54,7 +58,7 @@ function getAccountExpiry(user) {
     return expiryTime;
 }
 
-function ControlPanel({ user = null }) {
+function ControlPanel({ user = null, onLogout }) {
     const [collapsed, setCollapsed] = useState(false);
 
     // BLOCK 3: ACCOUNT DETAILS
@@ -134,13 +138,14 @@ function ControlPanel({ user = null }) {
                         {/* BLOCK 3: SETTINGS CONTENT */}
                         <div className="control-panel-content">
 
+                            {/* PROFILE DETAILS HEADING */}
                             <div className="control-panel-section-heading">
                                 <SettingOutlined />
                                 <span>Profile Details</span>
                             </div>
 
+                            {/* PROFILE DETAILS */}
                             <div className="profile-details">
-
                                 {profileDetails.map((item) => (
                                     <div
                                         className="profile-detail-item"
@@ -159,7 +164,19 @@ function ControlPanel({ user = null }) {
                                         </div>
                                     </div>
                                 ))}
+                            </div>
 
+                            {/* BLOCK 4: LOGOUT */}
+                            <div className="control-panel-logout">
+                                <Button
+                                    danger
+                                    block
+                                    icon={<LogoutOutlined />}
+                                    onClick={onLogout}
+                                    disabled={!onLogout}
+                                >
+                                    Logout
+                                </Button>
                             </div>
 
                         </div>
