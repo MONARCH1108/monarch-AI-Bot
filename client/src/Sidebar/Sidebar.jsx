@@ -1,7 +1,5 @@
-
 import { useState } from "react";
 import { Layout, Menu, Button, Avatar, Tooltip } from "antd";
-
 import {
     PlusOutlined,
     MessageOutlined,
@@ -9,7 +7,6 @@ import {
     MenuUnfoldOutlined,
     UserOutlined
 } from "@ant-design/icons";
-
 import "./Sidebar.css";
 import monarchLogo from "../assets/monarch-logo.png";
 
@@ -18,13 +15,10 @@ const { Sider } = Layout;
 // BLOCK 1: FORMAT CONVERSATION DATE
 function formatChatDate(dateString) {
     if (!dateString) return "Untitled conversation";
-
     const date = new Date(dateString);
-
     if (Number.isNaN(date.getTime())) {
         return "Unknown date";
     }
-
     return new Intl.DateTimeFormat("en-IN", {
         day: "2-digit",
         month: "short",
@@ -45,7 +39,6 @@ function Sidebar({
     onNewChat
 }) {
     const [collapsed, setCollapsed] = useState(false);
-
     // BLOCK 2: SORT CONVERSATIONS
     const sortedConversations = [...conversations].sort(
         (a, b) =>
@@ -72,7 +65,6 @@ function Sidebar({
     // BLOCK 6: USER PROFILE DETAILS
     const username = user?.username || "Guest User";
     const accountStatus = user ? "Guest Account" : "Not signed in";
-
     return (
         <Sider
             motion={true}
@@ -168,20 +160,15 @@ function Sidebar({
                         }
                         onClick={handleChatSelection}
                     />
-
                 </div>
 
                 {/* BLOCK 4: USER PROFILE */}
-                <div className="sidebar-user">
-
-                    <Avatar icon={<UserOutlined />} />
-
+                <div className="sidebar-user">                    <Avatar icon={<UserOutlined />} />
                     {!collapsed && (
                         <div className="sidebar-user-details">
                             <span className="sidebar-user-name">
                                 {username}
                             </span>
-
                             <span className="sidebar-user-status">
                                 {accountStatus}
                             </span>

@@ -1,11 +1,8 @@
-
 import { useState, useEffect } from "react";
-
 import {
     getAllChats,
     getChatHistory
 } from "./ControlPanel/Account/auth";
-
 import {
     getAvailableModels,
     sendChatMessage
@@ -16,20 +13,15 @@ const SESSION_STORAGE_KEY = "monarch_ai_session";
 
 // BLOCK 1: READ SAVED SESSION
 const getSavedSession = () => {
-
     try {
         const savedSession = localStorage.getItem(SESSION_STORAGE_KEY);
-
         if (!savedSession) return {};
-
         const parsedSession = JSON.parse(savedSession);
-
         return {
             user: parsedSession.user || null,
             selectedChatId: parsedSession.selectedChatId || null,
             selectedModel: parsedSession.selectedModel || DEFAULT_MODEL
         };
-
     } catch (error) {
         console.error("Unable to restore saved session:", error);
         return {};
@@ -51,11 +43,9 @@ function useAppState() {
 
     // BLOCK 5: CONVERSATION STATES
     const [conversations, setConversations] = useState([]);
-
     const [selectedChatId, setSelectedChatId] = useState(
         initialSession.selectedChatId
     );
-
     const [chatsLoading, setChatsLoading] = useState(false);
     const [chatsError, setChatsError] = useState("");
 
@@ -70,28 +60,23 @@ function useAppState() {
 
     // BLOCK 8: MODEL STATES
     const [availableModels, setAvailableModels] = useState([]);
-
     const [selectedModel, setSelectedModel] = useState(
         initialSession.selectedModel
     );
-
     const [modelsLoading, setModelsLoading] = useState(false);
     const [modelsError, setModelsError] = useState("");
 
     // BLOCK 9: PERSIST APPLICATION SESSION
     useEffect(() => {
-
         if (!user) {
             localStorage.removeItem(SESSION_STORAGE_KEY);
             return;
         }
-
         const session = {
             user,
             selectedChatId,
             selectedModel
         };
-
         try {
             localStorage.setItem(
                 SESSION_STORAGE_KEY,
@@ -100,42 +85,30 @@ function useAppState() {
         } catch (error) {
             console.error("Unable to save session:", error);
         }
-
     }, [user, selectedChatId, selectedModel]);
 
     // BLOCK 10: FETCH AVAILABLE MODELS
     useEffect(() => {
-
         const controller = new AbortController();
-
         const fetchModels = async () => {
-
             setModelsLoading(true);
             setModelsError("");
-
             try {
-
                 const response = await getAvailableModels(
                     controller.signal
                 );
-
                 if (controller.signal.aborted) return;
 
                 // Keep every model returned by the API.
                 const allModels = response.models || [];
-
                 setAvailableModels(allModels);
-
                 const selectedModelExists = allModels.some(
                     (model) => model.id === selectedModel
                 );
-
                 if (!selectedModelExists) {
-
                     const defaultModelExists = allModels.some(
                         (model) => model.id === DEFAULT_MODEL
                     );
-
                     if (defaultModelExists) {
                         setSelectedModel(DEFAULT_MODEL);
                     } else if (allModels.length > 0) {
@@ -146,15 +119,11 @@ function useAppState() {
                 }
 
             } catch (error) {
-
                 if (controller.signal.aborted) return;
-
                 setModelsError(
                     error.message || "Unable to load available models."
                 );
-
             } finally {
-
                 if (!controller.signal.aborted) {
                     setModelsLoading(false);
                 }
@@ -162,7 +131,6 @@ function useAppState() {
         };
 
         fetchModels();
-
         return () => {
             controller.abort();
         };
@@ -171,19 +139,14 @@ function useAppState() {
 
     // BLOCK 11: CLEAR EXPIRED SESSION
     const handleSessionExpired = () => {
-
         localStorage.removeItem(SESSION_STORAGE_KEY);
-
         setUser(null);
-
         setConversations([]);
         setSelectedChatId(null);
         setChatHistory([]);
-
         setChatsError("");
         setHistoryError("");
         setSendingError("");
-
         setChatsLoading(false);
         setHistoryLoading(false);
         setSending(false);
@@ -191,17 +154,13 @@ function useAppState() {
 
     // BLOCK 12: AUTHENTICATION SUCCESS
     const handleAuthenticated = (userData) => {
-
         setUser(userData);
-
         setConversations([]);
         setSelectedChatId(null);
         setChatHistory([]);
-
         setChatsError("");
         setHistoryError("");
         setSendingError("");
-
         setChatsLoading(false);
         setHistoryLoading(false);
         setSending(false);
@@ -209,46 +168,32 @@ function useAppState() {
  
     // BLOCK 13: RESTORE / FETCH CONVERSATIONS
     useEffect(() => {
-
         if (!user?.user_uuid) {
             setConversations([]);
             setChatsLoading(false);
             return;
         }
-
         const controller = new AbortController();
-
         const fetchChats = async () => {
-
             setChatsLoading(true);
             setChatsError("");
-
             try {
-
                 const response = await getAllChats(
                     user.user_uuid,
                     controller.signal
                 );
-
                 if (controller.signal.aborted) return;
-
                 setConversations(response.conversations || []);
-
             } catch (error) {
-
                 if (controller.signal.aborted) return;
-
                 if (isAuthenticationError(error)) {
                     handleSessionExpired();
                     return;
                 }
-
                 setChatsError(
                     error.message || "Unable to load conversations."
                 );
-
             } finally {
-
                 if (!controller.signal.aborted) {
                     setChatsLoading(false);
                 }
@@ -273,10 +218,8 @@ function useAppState() {
 
     // BLOCK 14: HANDLE NEW CHAT
     const handleNewChat = () => {
-
         setSelectedChatId(null);
         setChatHistory([]);
-
         setHistoryError("");
         setSendingError("");
         setHistoryLoading(false);
@@ -284,11 +227,8 @@ function useAppState() {
 
     // BLOCK 15: HANDLE CONVERSATION SELECTION
     const handleSelectChat = (chatId) => {
-
         if (chatId === selectedChatId) return;
-
         setSelectedChatId(chatId);
-
         setChatHistory([]);
         setHistoryError("");
         setSendingError("");
@@ -296,58 +236,42 @@ function useAppState() {
 
     // BLOCK 16: FETCH CHAT HISTORY WHEN SELECTION CHANGES
     useEffect(() => {
-
         if (!user?.user_uuid || !selectedChatId) {
             setChatHistory([]);
             setHistoryError("");
             setHistoryLoading(false);
             return;
         }
-
         const controller = new AbortController();
-
         const fetchHistory = async () => {
-
             setChatHistory([]);
             setHistoryError("");
             setHistoryLoading(true);
-
             try {
-
                 const response = await getChatHistory(
                     user.user_uuid,
                     selectedChatId,
                     controller.signal
                 );
-
                 if (controller.signal.aborted) return;
-
                 setChatHistory(response.history || []);
-
             } catch (error) {
-
                 if (controller.signal.aborted) return;
-
                 if (isAuthenticationError(error)) {
                     handleSessionExpired();
                     return;
                 }
-
                 setHistoryError(
                     error.message ||
                     "Unable to load conversation history."
                 );
-
             } finally {
-
                 if (!controller.signal.aborted) {
                     setHistoryLoading(false);
                 }
             }
         };
-
         fetchHistory();
-
         return () => {
             controller.abort();
         };
@@ -356,21 +280,17 @@ function useAppState() {
 
     // BLOCK 17: SEND CHAT MESSAGE
     const handleSendMessage = async (message) => {
-
         if (!user?.user_uuid) {
             setSendingError("Please sign in before sending a message.");
             return false;
         }
-
         if (sending) {
             return false;
         }
-
         if (!selectedModel) {
             setSendingError("Please select an available model.");
             return false;
         }
-
         setSending(true);
         setSendingError("");
         setHistoryError("");
@@ -379,9 +299,7 @@ function useAppState() {
         const currentChatId = selectedChatId;
         const currentModel = selectedModel;
         const currentUser = user;
-
         try {
-
             const response = await sendChatMessage({
                 user_uuid: currentUser.user_uuid,
                 chat_id: currentChatId,
@@ -463,17 +381,13 @@ function useAppState() {
 
         // Remove the persisted session immediately.
         localStorage.removeItem(SESSION_STORAGE_KEY);
-
         setUser(null);
-
         setConversations([]);
         setSelectedChatId(null);
         setChatHistory([]);
-
         setChatsError("");
         setHistoryError("");
         setSendingError("");
-
         setChatsLoading(false);
         setHistoryLoading(false);
         setSending(false);
@@ -500,28 +414,21 @@ function useAppState() {
     // BLOCK 24: EXPOSE APPLICATION STATE
     return {
         user,
-
         conversations,
         selectedChatId,
-
         chatsLoading,
         chatsError,
-
         chatHistory,
         historyLoading,
         historyError,
-
         sending,
         sendingError,
-
         availableModels,
         selectedModel,
         setSelectedModel,
         modelsLoading,
         modelsError,
-
         selectedChatTitle,
-
         handleAuthenticated,
         handleNewChat,
         handleSelectChat,

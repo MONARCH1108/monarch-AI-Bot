@@ -32,32 +32,24 @@ function Account({ onAuthenticated }) {
 
                 // Extract user details from nested API response
                 const createdUser = response.user;
-
                 if (!createdUser?.user_uuid) {
                     throw new Error("Signup succeeded, but UUID was not returned.");
                 }
-
                 setUserUUID(createdUser.user_uuid);
                 setUsername(createdUser.username);
-
                 setSuccess(
                     "Account created successfully. Copy and save your UUID."
                 );
-
             } else {
                 const response = await login(username, userUUID);
 
                 // Extract authenticated user details
                 const authenticatedUser = response.user || response;
-
                 setSuccess("Login successful! Welcome to Monarch.");
-
                 onAuthenticated?.(authenticatedUser);
             }
-
         } catch (err) {
             setError(err.message || "Something went wrong.");
-
         } finally {
             setLoading(false);
         }
@@ -81,7 +73,6 @@ function Account({ onAuthenticated }) {
         setSuccess("");
         setCopied(false);
     };
-
     return (
         <div className="account-container">
 
@@ -90,7 +81,6 @@ function Account({ onAuthenticated }) {
                 <h3>
                     {mode === "signup" ? "Create Account" : "Welcome Back"}
                 </h3>
-
                 <p>
                     {mode === "signup"
                         ? "Create your Monarch guest account."
@@ -107,7 +97,6 @@ function Account({ onAuthenticated }) {
                 >
                     Login
                 </Button>
-
                 <Button
                     type={mode === "signup" ? "primary" : "text"}
                     onClick={() => switchMode("signup")}
@@ -126,7 +115,6 @@ function Account({ onAuthenticated }) {
                     onChange={(event) => setUsername(event.target.value)}
                     disabled={loading}
                 />
-
                 {mode === "login" && (
                     <Input
                         prefix={<IdcardOutlined />}
