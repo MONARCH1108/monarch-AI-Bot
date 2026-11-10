@@ -606,3 +606,229 @@
         display: none;
     }
 }
+
+
+/* =========================================
+   BLOCK 10 — MARKDOWN RENDERING
+   ========================================= */
+
+.assistant-message .message-text.markdown-content {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    line-height: 1.75;
+    font-size: 13.5px;
+    color: #e8e4eb;
+}
+
+/* Paragraphs */
+
+.markdown-content p {
+    margin: 0 0 16px;
+    line-height: 1.75;
+}
+
+.markdown-content p:last-child {
+    margin-bottom: 0;
+}
+
+/* Headings */
+
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3,
+.markdown-content h4,
+.markdown-content h5,
+.markdown-content h6 {
+    color: #f3edf9;
+    font-weight: 600;
+    line-height: 1.4;
+    margin: 22px 0 12px;
+}
+
+.markdown-content h1 {
+    font-size: 21px;
+}
+
+.markdown-content h2 {
+    font-size: 18px;
+}
+
+.markdown-content h3 {
+    font-size: 16px;
+}
+
+.markdown-content h4,
+.markdown-content h5,
+.markdown-content h6 {
+    font-size: 14px;
+}
+
+/* Bold and italic */
+
+.markdown-content strong {
+    color: #ffffff;
+    font-weight: 650;
+}
+
+.markdown-content em {
+    color: #d8c4eb;
+}
+
+/* Lists */
+
+.markdown-content ul,
+.markdown-content ol {
+    margin: 10px 0 18px;
+    padding-left: 25px;
+}
+
+.markdown-content li {
+    padding-left: 4px;
+    margin-bottom: 7px;
+    line-height: 1.7;
+}
+
+.markdown-content li::marker {
+    color: #b58bdc;
+}
+
+.markdown-content li > p {
+    margin-bottom: 6px;
+}
+
+/* Inline code */
+
+.markdown-content :not(pre) > code {
+    padding: 2px 6px;
+    border: 1px solid rgba(178, 126, 255, 0.16);
+    border-radius: 5px;
+    background: rgba(117, 76, 158, 0.16);
+    color: #d8b8ff;
+    font-family: "Consolas", "Monaco", monospace;
+    font-size: 0.9em;
+}
+
+/* Code blocks */
+
+.markdown-content pre {
+    margin: 14px 0 18px;
+    padding: 16px;
+    max-width: 100%;
+    overflow-x: auto;
+    border: 1px solid rgba(178, 126, 255, 0.15);
+    border-radius: 10px;
+    background: #17151d;
+    font-size: 12px;
+    line-height: 1.65;
+    scrollbar-width: thin;
+    scrollbar-color: #51415f transparent;
+}
+
+.markdown-content pre code {
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: #e8e4eb;
+    font-family: "Consolas", "Monaco", monospace;
+    font-size: inherit;
+    white-space: pre;
+}
+
+/* Blockquotes */
+
+.markdown-content blockquote {
+    margin: 14px 0;
+    padding: 10px 16px;
+    border-left: 3px solid #9060bf;
+    border-radius: 0 7px 7px 0;
+    background: rgba(117, 76, 158, 0.09);
+    color: #c7bdcf;
+}
+
+.markdown-content blockquote p {
+    margin: 0;
+}
+
+/* Tables */
+
+.markdown-content table {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    margin: 16px 0;
+    overflow-x: auto;
+    border-collapse: collapse;
+    border-spacing: 0;
+    font-size: 12.5px;
+}
+
+.markdown-content th,
+.markdown-content td {
+    padding: 10px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    text-align: left;
+    vertical-align: top;
+}
+
+.markdown-content th {
+    background: rgba(117, 76, 158, 0.18);
+    color: #e9d9fa;
+    font-weight: 600;
+}
+
+.markdown-content td {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+/* Links */
+
+.markdown-content a {
+    color: #bd91ed;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(189, 145, 237, 0.35);
+    transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.markdown-content a:hover {
+    color: #d7b8ff;
+    border-color: #d7b8ff;
+}
+
+/* Horizontal rules */
+
+.markdown-content hr {
+    height: 1px;
+    margin: 22px 0;
+    border: none;
+    background: rgba(255, 255, 255, 0.12);
+}
+
+/* Images */
+
+.markdown-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+/* Responsive Markdown */
+
+@media (max-width: 700px) {
+    .assistant-message .message-text.markdown-content {
+        font-size: 13px;
+    }
+
+    .markdown-content pre {
+        padding: 12px;
+        font-size: 11px;
+    }
+
+    .markdown-content table {
+        font-size: 11.5px;
+    }
+
+    .markdown-content th,
+    .markdown-content td {
+        padding: 8px;
+    }
+}

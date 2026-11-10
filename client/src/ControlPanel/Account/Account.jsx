@@ -20,7 +20,8 @@ function Account({ onAuthenticated }) {
     const [copied, setCopied] = useState(false);
 
     // BLOCK 1: SIGNUP / LOGIN
-    const handleSubmit = async () => {
+    const handleSubmit = async (e) => {
+        if (e?.preventDefault) e.preventDefault();
         setError("");
         setSuccess("");
         setCopied(false);
@@ -73,76 +74,93 @@ function Account({ onAuthenticated }) {
         setSuccess("");
         setCopied(false);
     };
+
+    // BLOCK 4: ENTER KEY SHORTCUT
+    const handleKeyDown = (event) => {
+        if (event.key === "Enter") {
+            const canSubmit = username.trim() && (mode === "signup" || userUUID.trim());
+            if (canSubmit && !loading) {
+                handleSubmit(event);
+            }
+        }
+    };
+
     return (
         <div className="account-container">
 
-            {/* BLOCK 4: ACCOUNT HEADING */}
+            {/* BLOCK 5: ACCOUNT HEADING */}
             <div className="account-heading">
-                <h3>
-                    {mode === "signup" ? "Create Account" : "Welcome Back"}
-                </h3>
+                <h2>
+                    {mode === "signup" ? "Create an Account" : "Welcome Back"}
+                </h2>
                 <p>
                     {mode === "signup"
-                        ? "Create your Monarch guest account."
-                        : "Enter your account credentials to continue."}
+                        ? "Create your Monarch guest account to get started."
+                        : "Enter your credentials to continue to Monarch."}
                 </p>
             </div>
 
-            {/* BLOCK 5: MODE SWITCH */}
-            <div className="account-mode-switch">
-                <Button
-                    type={mode === "login" ? "primary" : "text"}
-                    onClick={() => switchMode("login")}
-                    disabled={loading}
-                >
-                    Login
-                </Button>
-                <Button
-                    type={mode === "signup" ? "primary" : "text"}
-                    onClick={() => switchMode("signup")}
-                    disabled={loading}
-                >
-                    Sign Up
-                </Button>
-            </div>
-
             {/* BLOCK 6: ACCOUNT FORM */}
-            <div className="account-form">
-                <Input
-                    prefix={<UserOutlined />}
-                    placeholder="Username"
-                    value={username}
-                    onChange={(event) => setUsername(event.target.value)}
-                    disabled={loading}
-                />
-                {mode === "login" && (
+            <form className="account-form" onSubmit={handleSubmit}>
+                <div className="auth-field-group">
+                    <label className="auth-field-label" htmlFor="auth-username">
+                        Username
+                    </label>
                     <Input
-                        prefix={<IdcardOutlined />}
-                        placeholder="User UUID"
-                        value={userUUID}
-                        onChange={(event) => setUserUUID(event.target.value)}
+                        id="auth-username"
+                        prefix={<UserOutlined className="auth-input-icon" />}
+                        placeholder="Enter your username"
+                        value={username}
+                        onChange={(event) => setUsername(event.target.value)}
+                        onKeyDown={handleKeyDown}
                         disabled={loading}
+                        autoComplete="username"
                     />
+                </div>
+
+                {mode === "login" && (
+                    <div className="auth-field-group">
+                        <label className="auth-field-label" htmlFor="auth-uuid">
+                            User UUID
+                        </label>
+                        <Input
+                            id="auth-uuid"
+                            prefix={<IdcardOutlined className="auth-input-icon" />}
+                            placeholder="Enter your UUID"
+                            value={userUUID}
+                            onChange={(event) => setUserUUID(event.target.value)}
+                            onKeyDown={handleKeyDown}
+                            disabled={loading}
+                            autoComplete="off"
+                        />
+                    </div>
                 )}
 
                 <Button
                     type="primary"
                     block
+                    htmlType="submit"
                     loading={loading}
-                    onClick={handleSubmit}
+                    className="auth-submit-btn"
                     disabled={
                         !username.trim() ||
-                        (mode === "login" && !userUUID.trim())
+                        (mode === "login" && !userUUID.trim()) ||
+                        loading
                     }
                 >
                     {mode === "signup" ? "Create Account" : "Login"}
                 </Button>
-            </div>
+
+                {mode === "signup" && !userUUID && (
+                    <p className="auth-helper-note">
+                        A unique 24-hour guest UUID will be automatically generated for your account.
+                    </p>
+                )}
+            </form>
 
             {/* BLOCK 7: SIGNUP UUID DISPLAY */}
             {mode === "signup" && userUUID && (
                 <div className="account-uuid-section">
-
                     <div className="account-uuid-heading">
                         <IdcardOutlined />
                         <span>Your Account UUID</span>
@@ -174,12 +192,13 @@ function Account({ onAuthenticated }) {
                 </div>
             )}
 
-            {/* BLOCK 8: SUCCESS / ERROR MESSAGES */}
+            {/* BLOCK 8: SUCCESS / ERROR ALERTS */}
             {error && (
                 <Alert
                     message={error}
                     type="error"
                     showIcon
+                    className="auth-alert"
                 />
             )}
 
@@ -188,8 +207,38 @@ function Account({ onAuthenticated }) {
                     message={success}
                     type="success"
                     showIcon
+                    className="auth-alert"
                 />
             )}
+
+            {/* BLOCK 9: BOTTOM MODE SWITCH PROMPT */}
+            <div className="auth-switch-prompt">
+                {mode === "login" ? (
+                    <p>
+                        Don't have an account?{" "}
+                        <button
+                            type="button"
+                            className="auth-switch-link"
+                            onClick={() => switchMode("signup")}
+                            disabled={loading}
+                        >
+                            Create one
+                        </button>
+                    </p>
+                ) : (
+                    <p>
+                        Already have an account?{" "}
+                        <button
+                            type="button"
+                            className="auth-switch-link"
+                            onClick={() => switchMode("login")}
+                            disabled={loading}
+                        >
+                            Log in
+                        </button>
+                    </p>
+                )}
+            </div>
 
         </div>
     );

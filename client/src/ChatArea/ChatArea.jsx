@@ -1,7 +1,23 @@
+
 import { useState } from "react";
-import {Avatar,Button,Input,Select} from "antd";
-import {RobotOutlined,UserOutlined,CodeOutlined,BulbOutlined,FileTextOutlined,ReadOutlined,SendOutlined} from "@ant-design/icons";
+import { Avatar, Button, Input, Select } from "antd";
+import {
+    RobotOutlined,
+    UserOutlined,
+    CodeOutlined,
+    BulbOutlined,
+    FileTextOutlined,
+    ReadOutlined,
+    SendOutlined
+} from "@ant-design/icons";
+
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import rehypeHighlight from "rehype-highlight";
+
+import "highlight.js/styles/github-dark.css";
 import "./ChatArea.css";
+
 const { TextArea } = Input;
 
 function ChatArea({
@@ -21,6 +37,7 @@ function ChatArea({
 }) {
 
     const [message, setMessage] = useState("");
+
     // BLOCK 1: HANDLE MESSAGE INPUT
     const handleMessageChange = (event) => {
         setMessage(event.target.value);
@@ -29,11 +46,14 @@ function ChatArea({
     // BLOCK 2: HANDLE MESSAGE SUBMISSION
     const handleSendMessage = async () => {
         const cleanMessage = message.trim();
+
         if (!cleanMessage || !onSend || sending || loading) {
             return;
         }
+
         try {
             const result = await onSend(cleanMessage);
+
             // Clear input only when submission succeeds
             if (result !== false) {
                 setMessage("");
@@ -89,28 +109,37 @@ function ChatArea({
     // BLOCK 6: DETERMINE CHAT SCREEN
     const showWelcomeScreen =
         !chatTitle && messages.length === 0;
+
     return (
         <div className="chat-area">
 
             {/* BLOCK 1: CHAT HEADER */}
             <header className="chat-header">
+
                 <div className="chat-header-info">
+
                     <div className="chat-header-icon">
                         <RobotOutlined />
                     </div>
+
                     <div className="chat-header-details">
+
                         <span className="chat-header-title">
                             {chatTitle || "Monarch AI"}
                         </span>
+
                         <span className="chat-header-status">
                             <span className="status-indicator" />
                             AI Assistant
                         </span>
+
                     </div>
+
                 </div>
 
                 {/* BLOCK 2: DYNAMIC MODEL SELECTOR */}
                 <div className="model-selector-container">
+
                     <Select
                         className="model-selector"
                         placeholder={
@@ -143,59 +172,80 @@ function ChatArea({
                             {modelsError}
                         </span>
                     )}
+
                 </div>
+
             </header>
 
             {/* BLOCK 3: CHAT MESSAGE CONTAINER */}
             <main className="chat-content">
+
                 {showWelcomeScreen ? (
+
                     /* BLOCK 4: WELCOME SCREEN */
                     <div className="chat-welcome">
+
                         <div className="welcome-icon">
                             <RobotOutlined />
                         </div>
+
                         <h1>
                             How can I help you today?
                         </h1>
+
                         <p className="welcome-description">
                             Ask questions, explore ideas, or work
                             through a problem with Monarch AI.
                         </p>
+
                         <div className="suggestion-grid">
+
                             {suggestions.map((item) => (
                                 <div
                                     className="suggestion-card"
                                     key={item.title}
                                 >
+
                                     <div className="suggestion-icon">
                                         {item.icon}
                                     </div>
+
                                     <div className="suggestion-content">
+
                                         <span className="suggestion-title">
                                             {item.title}
                                         </span>
+
                                         <span className="suggestion-description">
                                             {item.description}
                                         </span>
+
                                     </div>
+
                                 </div>
                             ))}
+
                         </div>
+
                     </div>
+
                 ) : (
 
                     /* BLOCK 5: CONVERSATION MESSAGES */
                     <div className="chat-messages">
+
                         {loading && (
                             <div className="chat-loading">
                                 Loading conversation...
                             </div>
                         )}
+
                         {!loading && error && (
                             <div className="chat-error">
                                 {error}
                             </div>
                         )}
+
                         {!loading &&
                             !error &&
                             messages.length === 0 && (
@@ -203,50 +253,87 @@ function ChatArea({
                                     No messages in this conversation yet.
                                 </div>
                             )}
+
                         {!loading &&
                             !error &&
                             messages.map((item, index) => (
+
                                 <div
                                     className="message-pair"
                                     key={`${item.created_at || "message"}-${index}`}
                                 >
+
                                     {/* USER MESSAGE */}
                                     <div className="message-row user-message">
+
                                         <div className="message-body">
+
                                             <div className="message-role">
                                                 You
                                             </div>
+
                                             <div className="message-text">
                                                 {item.question}
                                             </div>
+
                                         </div>
+
                                         <Avatar
                                             className="message-avatar user-avatar"
                                             icon={<UserOutlined />}
                                         />
+
                                     </div>
 
-                                    {/* AI RESPONSE */}
+                                    {/* AI RESPONSE WITH MARKDOWN */}
                                     <div className="message-row assistant-message">
+
                                         <Avatar
                                             className="message-avatar assistant-avatar"
                                             icon={<RobotOutlined />}
                                         />
+
                                         <div className="message-body">
+
                                             <div className="message-role">
                                                 Monarch AI
                                             </div>
-                                            <div className="message-text">
-                                                {item.answer}
+
+                                            <div className="message-text markdown-content">
+
+                                                <ReactMarkdown
+                                                    remarkPlugins={[remarkGfm]}
+                                                    rehypePlugins={[rehypeHighlight]}
+                                                    components={{
+                                                        a: ({ href, children, ...props }) => (
+                                                            <a
+                                                                href={href}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                {...props}
+                                                            >
+                                                                {children}
+                                                            </a>
+                                                        )
+                                                    }}
+                                                >
+                                                    {item.answer || ""}
+                                                </ReactMarkdown>
+
                                             </div>
+
                                             {item.model && (
                                                 <div className="message-model">
                                                     {item.model}
                                                 </div>
                                             )}
+
                                         </div>
+
                                     </div>
+
                                 </div>
+
                             ))}
 
                         {/* BLOCK 6: SENDING INDICATOR */}
@@ -255,13 +342,18 @@ function ChatArea({
                                 Monarch AI is thinking...
                             </div>
                         )}
+
                     </div>
+
                 )}
+
             </main>
 
             {/* BLOCK 7: MESSAGE COMPOSER */}
             <footer className="chat-footer">
+
                 <div className="message-composer">
+
                     <TextArea
                         className="message-input"
                         placeholder="Message Monarch AI..."
@@ -274,10 +366,13 @@ function ChatArea({
                         onKeyDown={handleKeyDown}
                         disabled={sending || loading}
                     />
+
                     <div className="composer-actions">
+
                         <div className="composer-tools">
                             {/* Reserved for future composer functionality */}
                         </div>
+
                         <Button
                             type="primary"
                             className="send-button"
@@ -291,12 +386,17 @@ function ChatArea({
                                 loading
                             }
                         />
+
                     </div>
+
                 </div>
+
                 <p className="chat-disclaimer">
                     Monarch AI can make mistakes. Verify important information.
                 </p>
+
             </footer>
+
         </div>
     );
 }

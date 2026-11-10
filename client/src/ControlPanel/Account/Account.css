@@ -1,4 +1,3 @@
-
 /* =========================================
    BLOCK 1 — ACCOUNT CONTAINER
 ========================================= */
@@ -7,238 +6,158 @@
     display: flex;
     flex-direction: column;
     width: 100%;
-    gap: 18px;
-    padding: 16px 2px;
-    color: #e8e6ed;
+    max-width: 380px;
+    margin: 0 auto;
+    gap: 22px;
+    color: #f5f1fa;
 }
 
-
 /* =========================================
-   BLOCK 2 — ACCOUNT HEADING
+   BLOCK 2 — HEADING
 ========================================= */
 
 .account-heading {
     display: flex;
     flex-direction: column;
-    gap: 7px;
+    gap: 6px;
 }
 
-.account-heading h3 {
+.account-heading h2 {
     margin: 0;
-    color: #f3f0f7;
-    font-size: 16px;
+    color: #f5f1fa;
+    font-size: clamp(22px, 2.5vw, 26px);
     font-weight: 600;
-    letter-spacing: -0.3px;
+    letter-spacing: -0.4px;
 }
 
 .account-heading p {
     margin: 0;
-    color: rgba(220, 215, 230, 0.58);
-    font-size: 11.5px;
+    color: #aaa3b5;
+    font-size: 13px;
     line-height: 1.5;
 }
 
-
 /* =========================================
-   BLOCK 3 — LOGIN / SIGNUP SWITCH
-========================================= */
-
-.account-mode-switch {
-    display: flex;
-    width: 100%;
-    padding: 4px;
-    gap: 5px;
-    border: 1px solid rgba(255, 255, 255, 0.07);
-    border-radius: 9px;
-    background: rgba(255, 255, 255, 0.035);
-}
-
-.account-mode-switch .ant-btn {
-    flex: 1;
-    height: 32px;
-    border: none;
-    border-radius: 6px;
-    color: rgba(225, 220, 235, 0.65);
-    font-size: 12px;
-    font-weight: 500;
-    background: transparent;
-    box-shadow: none;
-    transition: all 200ms ease;
-}
-
-.account-mode-switch .ant-btn:hover {
-    color: #ffffff !important;
-    background: rgba(255, 255, 255, 0.06) !important;
-}
-
-.account-mode-switch .ant-btn-primary {
-    color: #ffffff;
-    background: linear-gradient(135deg, #754c9e, #895eb4);
-    box-shadow: 0 2px 10px rgba(117, 76, 158, 0.25);
-}
-
-.account-mode-switch .ant-btn-primary:hover {
-    background: linear-gradient(135deg, #855cae, #996ec4) !important;
-}
-
-
-/* =========================================
-   BLOCK 4 — ACCOUNT FORM
+   BLOCK 3 — FORM & FIELDS
 ========================================= */
 
 .account-form {
     display: flex;
     flex-direction: column;
     width: 100%;
-    gap: 11px;
+    gap: 16px;
 }
 
-.account-form .ant-input-affix-wrapper {
-    min-height: 38px;
-    padding: 0 12px;
-    border: 1px solid rgba(255, 255, 255, 0.09);
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.045);
+.auth-field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    width: 100%;
+}
+
+.auth-field-label {
+    color: #d8d2e2;
+    font-size: 12.5px;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+}
+
+.auth-field-group .ant-input-affix-wrapper {
+    height: 42px;
+    padding: 0 14px;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 10px;
+    background: #393343 !important;
     box-shadow: none;
     transition: all 200ms ease;
 }
 
-.account-form .ant-input-affix-wrapper:hover {
-    border-color: rgba(153, 105, 197, 0.55);
+.auth-field-group .ant-input-affix-wrapper:hover {
+    border-color: rgba(168, 85, 247, 0.45);
 }
 
-.account-form .ant-input-affix-wrapper-focused {
-    border-color: #895eb4 !important;
-    background: rgba(117, 76, 158, 0.07);
-    box-shadow: 0 0 0 2px rgba(117, 76, 158, 0.12);
+.auth-field-group .ant-input-affix-wrapper-focused,
+.auth-field-group .ant-input-affix-wrapper:focus {
+    border-color: #8b35d0 !important;
+    background: #3f384a !important;
+    box-shadow: 0 0 0 2px rgba(139, 53, 208, 0.25) !important;
 }
 
-.account-form .ant-input {
-    color: #f1edf6;
+.auth-field-group .ant-input-affix-wrapper > input.ant-input {
+    color: #ffffff !important;
+    font-size: 13px;
+    background: transparent !important;
+    caret-color: #c084fc;
+    -webkit-text-fill-color: #ffffff;
+}
+
+.auth-field-group .ant-input-affix-wrapper > input.ant-input::placeholder {
+    color: #8e889b !important;
+    -webkit-text-fill-color: #8e889b;
     font-size: 12.5px;
-    background: transparent;
 }
 
-.account-form .ant-input::placeholder {
-    color: rgba(220, 215, 230, 0.38);
+.auth-input-icon {
+    color: #b39ddb;
+    font-size: 15px;
+    margin-right: 6px;
 }
-
-.account-form .ant-input-prefix {
-    margin-right: 9px;
-    color: rgba(190, 160, 220, 0.75);
-}
-
 
 /* =========================================
-   BLOCK 5 — SUBMIT BUTTON
+   BLOCK 4 — SUBMIT BUTTON
 ========================================= */
 
-.account-form > .ant-btn-primary {
-    height: 38px;
+.auth-submit-btn.ant-btn {
+    height: 42px;
     margin-top: 4px;
     border: none;
-    border-radius: 8px;
+    border-radius: 10px;
     color: #ffffff;
-    font-size: 12.5px;
-    font-weight: 500;
+    font-size: 13.5px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+
     background: linear-gradient(
-        110deg,
-        #68418f 0%,
-        #8658ad 100%
+        135deg,
+        #8b35d0 0%,
+        #a04ce2 100%
     );
-    box-shadow: 0 3px 12px rgba(117, 76, 158, 0.22);
-    transition: all 200ms ease;
+
+    box-shadow: 0 4px 18px rgba(139, 53, 208, 0.35);
+    transition: all 220ms ease;
 }
 
-.account-form > .ant-btn-primary:hover:not(:disabled) {
+.auth-submit-btn.ant-btn:hover:not(:disabled) {
     background: linear-gradient(
-        110deg,
-        #79509f 0%,
-        #9669bd 100%
+        135deg,
+        #9941e0 0%,
+        #af5bf0 100%
     ) !important;
-    box-shadow: 0 4px 16px rgba(117, 76, 158, 0.3);
+    box-shadow: 0 6px 22px rgba(139, 53, 208, 0.45);
     transform: translateY(-1px);
 }
 
-.account-form > .ant-btn-primary:active:not(:disabled) {
+.auth-submit-btn.ant-btn:active:not(:disabled) {
     transform: translateY(0);
 }
 
-.account-form > .ant-btn-primary:disabled {
-    color: rgba(255, 255, 255, 0.4);
-    background: rgba(117, 76, 158, 0.35);
+.auth-submit-btn.ant-btn:disabled {
+    background: #3a3345 !important;
+    color: #7a7387 !important;
     box-shadow: none;
     transform: none;
 }
 
-
-/* =========================================
-   BLOCK 6 — SUCCESS / ERROR ALERTS
-========================================= */
-
-.account-container .ant-alert {
-    padding: 10px 11px;
-    border-radius: 8px;
-    font-size: 11px;
-}
-
-/* Force alert text to white */
-.account-container .ant-alert .ant-alert-content,
-.account-container .ant-alert .ant-alert-message,
-.account-container .ant-alert .ant-alert-description,
-.account-container .ant-alert .ant-alert-title {
-    color: #ffffff !important;
-    -webkit-text-fill-color: #ffffff !important;
-    font-size: 11px;
+.auth-helper-note {
+    margin: -4px 0 0;
+    color: #9e97ab;
+    font-size: 11.5px;
     line-height: 1.5;
+    text-align: center;
 }
-
-.account-container .ant-alert-error {
-    border: 1px solid rgba(255, 90, 90, 0.18);
-    background: rgba(150, 40, 40, 0.12);
-}
-
-.account-container .ant-alert-success {
-    border: 1px solid rgba(75, 190, 130, 0.18);
-    background: rgba(40, 130, 85, 0.12);
-}
-
-/* Success icon */
-.account-container .ant-alert-success .ant-alert-icon {
-    color: #52c41a !important;
-}
-/* =========================================
-   BLOCK 7 — COLLAPSED / NARROW PANEL
-========================================= */
-
-@media (max-width: 380px) {
-    .account-container {
-        padding-right: 0;
-        padding-left: 0;
-    }
-
-    .account-heading h3 {
-        font-size: 17px;
-    }
-}
-
-/* FIX — INPUT TEXT VISIBILITY */
-
-.account-form .ant-input-affix-wrapper > input.ant-input {
-    color: #ffffff !important;
-    background: transparent !important;
-    caret-color: #ffffff;
-    -webkit-text-fill-color: #ffffff;
-}
-
-.account-form .ant-input-affix-wrapper > input.ant-input::placeholder {
-    color: rgba(220, 215, 230, 0.45) !important;
-    -webkit-text-fill-color: rgba(220, 215, 230, 0.45);
-}
-
 
 /* =========================================
-   BLOCK 8 — ACCOUNT UUID SECTION
+   BLOCK 5 — SIGNUP UUID COPY SECTION
 ========================================= */
 
 .account-uuid-section {
@@ -246,63 +165,149 @@
     flex-direction: column;
     width: 100%;
     gap: 10px;
-    padding: 12px;
-    border: 1px solid rgba(153, 105, 197, 0.25);
-    border-radius: 9px;
-    background: rgba(117, 76, 158, 0.08);
+    padding: 13px 15px;
+    border: 1px solid rgba(168, 85, 247, 0.28);
+    border-radius: 10px;
+    background: rgba(139, 53, 208, 0.10);
+    animation: authFadeIn 250ms ease;
 }
 
 .account-uuid-heading {
     display: flex;
     align-items: center;
     gap: 8px;
-    color: #c6a6e5;
-    font-size: 12px;
+    color: #cbb2fe;
+    font-size: 12.5px;
     font-weight: 600;
 }
 
 .account-uuid-section p {
     margin: 0;
-    color: rgba(220, 215, 230, 0.65);
-    font-size: 11px;
+    color: #c2bbcd;
+    font-size: 11.5px;
     line-height: 1.5;
 }
 
 .account-uuid-copy {
     display: flex;
     align-items: stretch;
-    gap: 6px;
+    gap: 7px;
     width: 100%;
 }
 
 .account-uuid-copy .ant-input {
     min-width: 0;
-    height: 34px;
+    height: 36px;
     color: #ffffff !important;
-    font-size: 11px;
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.12);
-    border-radius: 7px;
+    font-size: 12px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
 }
 
 .account-uuid-copy .ant-btn {
-    height: 34px;
+    height: 36px;
     flex-shrink: 0;
     border: none;
-    border-radius: 7px;
+    border-radius: 8px;
     color: #ffffff;
-    font-size: 11.5px;
-    background: #754c9e;
+    font-size: 12px;
+    font-weight: 500;
+    background: #8b35d0;
     transition: all 200ms ease;
 }
 
 .account-uuid-copy .ant-btn:hover {
     color: #ffffff !important;
-    background: #895eb4 !important;
-    box-shadow: 0 2px 8px rgba(117, 76, 158, 0.25);
+    background: #a04ce2 !important;
+    box-shadow: 0 2px 10px rgba(139, 53, 208, 0.35);
     transform: translateY(-1px);
 }
 
 .account-uuid-copy .ant-btn:active {
     transform: translateY(0);
+}
+
+/* =========================================
+   BLOCK 6 — ALERTS
+========================================= */
+
+.auth-alert.ant-alert {
+    padding: 10px 12px;
+    border-radius: 9px;
+    font-size: 12px;
+    animation: authFadeIn 250ms ease;
+}
+
+.auth-alert .ant-alert-content,
+.auth-alert .ant-alert-message {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.auth-alert.ant-alert-error {
+    border: 1px solid rgba(248, 113, 113, 0.25);
+    background: rgba(185, 28, 28, 0.18);
+}
+
+.auth-alert.ant-alert-success {
+    border: 1px solid rgba(74, 222, 128, 0.25);
+    background: rgba(21, 128, 61, 0.18);
+}
+
+/* =========================================
+   BLOCK 7 — BOTTOM MODE SWITCH PROMPT
+========================================= */
+
+.auth-switch-prompt {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 4px;
+    text-align: center;
+}
+
+.auth-switch-prompt p {
+    margin: 0;
+    color: #aaa3b5;
+    font-size: 13px;
+}
+
+.auth-switch-link {
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin-left: 2px;
+    color: #c084fc;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: color 180ms ease;
+    font-family: inherit;
+}
+
+.auth-switch-link:hover {
+    color: #e9d5ff;
+    text-decoration: underline;
+}
+
+.auth-switch-link:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    text-decoration: none;
+}
+
+/* Subtle fade in keyframes */
+@keyframes authFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }

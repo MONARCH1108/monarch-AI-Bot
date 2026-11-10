@@ -1,0 +1,153 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 700" width="100%" height="100%" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <!-- Sky Gradient -->
+    <linearGradient id="skyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#120924"/>
+      <stop offset="35%" stop-color="#24103e"/>
+      <stop offset="60%" stop-color="#461664"/>
+      <stop offset="80%" stop-color="#7a2082"/>
+      <stop offset="95%" stop-color="#aa3388"/>
+      <stop offset="100%" stop-color="#d45087"/>
+    </linearGradient>
+
+    <!-- Mountain Layer Gradients -->
+    <linearGradient id="mountBack" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#692275"/>
+      <stop offset="100%" stop-color="#341045"/>
+    </linearGradient>
+
+    <linearGradient id="mountMid" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#431359"/>
+      <stop offset="100%" stop-color="#220933"/>
+    </linearGradient>
+
+    <linearGradient id="mountFore" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#2a093b"/>
+      <stop offset="100%" stop-color="#14041e"/>
+    </linearGradient>
+
+    <linearGradient id="mountFront" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1c0529"/>
+      <stop offset="100%" stop-color="#0a020f"/>
+    </linearGradient>
+
+    <!-- Glows -->
+    <radialGradient id="moonGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffb6e9" stop-opacity="0.9"/>
+      <stop offset="40%" stop-color="#e06cd4" stop-opacity="0.4"/>
+      <stop offset="80%" stop-color="#9d2bb5" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#120924" stop-opacity="0"/>
+    </radialGradient>
+
+    <radialGradient id="sunGlow" cx="65%" cy="65%" r="45%">
+      <stop offset="0%" stop-color="#ffa5d8" stop-opacity="0.6"/>
+      <stop offset="50%" stop-color="#b03294" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#461664" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Mist Filter -->
+    <linearGradient id="mistGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#f48fb1" stop-opacity="0"/>
+      <stop offset="50%" stop-color="#e1bee7" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#7b1fa2" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Sky -->
+  <rect width="500" height="700" fill="url(#skyGrad)"/>
+
+  <!-- Horizon Ambient Glow -->
+  <circle cx="320" cy="460" r="280" fill="url(#sunGlow)"/>
+
+  <!-- Stars -->
+  <g fill="#ffffff">
+    <circle cx="45" cy="60" r="1" opacity="0.7"/>
+    <circle cx="85" cy="120" r="1.3" opacity="0.9"/>
+    <circle cx="130" cy="45" r="0.8" opacity="0.5"/>
+    <circle cx="170" cy="95" r="1.2" opacity="0.8"/>
+    <circle cx="210" cy="40" r="1.5" opacity="0.85"/>
+    <circle cx="260" cy="110" r="0.9" opacity="0.6"/>
+    <circle cx="310" cy="55" r="1.1" opacity="0.75"/>
+    <circle cx="360" cy="85" r="1.4" opacity="0.9"/>
+    <circle cx="410" cy="40" r="0.8" opacity="0.6"/>
+    <circle cx="445" cy="130" r="1.2" opacity="0.7"/>
+    <circle cx="70" cy="180" r="1" opacity="0.6"/>
+    <circle cx="115" cy="220" r="0.8" opacity="0.5"/>
+    <circle cx="190" cy="160" r="1.3" opacity="0.8"/>
+    <circle cx="240" cy="210" r="0.7" opacity="0.4"/>
+    <circle cx="380" cy="170" r="1.2" opacity="0.75"/>
+    <circle cx="430" cy="230" r="0.9" opacity="0.5"/>
+    <circle cx="465" cy="75" r="1.6" opacity="0.9"/>
+    <circle cx="280" cy="145" r="1.1" opacity="0.7"/>
+    <circle cx="155" cy="260" r="0.8" opacity="0.5"/>
+  </g>
+
+  <!-- Luminous Moon / Celestial Body -->
+  <circle cx="370" cy="140" r="70" fill="url(#moonGlow)"/>
+  <circle cx="370" cy="140" r="22" fill="#fff5fc" opacity="0.95"/>
+  <circle cx="378" cy="134" r="19" fill="#24103e" opacity="0.88"/>
+
+  <!-- Distant Peak 1 (Back Layer) -->
+  <path d="M-20,490 L60,370 L145,440 L210,345 L290,430 L395,305 L475,395 L530,340 L530,700 L-20,700 Z" fill="url(#mountBack)" opacity="0.85"/>
+  
+  <!-- Subtle mist between layers -->
+  <rect x="0" y="380" width="500" height="90" fill="url(#mistGrad)"/>
+
+  <!-- Mid-distance Mountains -->
+  <path d="M-30,520 L40,425 L110,480 L185,400 L270,475 L345,385 L420,460 L520,380 L520,700 L-30,700 Z" fill="url(#mountMid)"/>
+
+  <!-- Mountain Ridges / Highlights -->
+  <path d="M185,400 L200,485 L270,475 Z" fill="#581c73" opacity="0.45"/>
+  <path d="M345,385 L375,470 L420,460 Z" fill="#692275" opacity="0.4"/>
+  <path d="M40,425 L65,510 L110,480 Z" fill="#581c73" opacity="0.35"/>
+
+  <!-- Mist Layer 2 -->
+  <rect x="0" y="440" width="500" height="80" fill="url(#mistGrad)" opacity="0.7"/>
+
+  <!-- Foreground Mountains -->
+  <path d="M-40,565 L35,480 L130,545 L225,465 L315,530 L405,455 L490,520 L530,500 L530,700 L-40,700 Z" fill="url(#mountFore)"/>
+
+  <!-- Ridge Highlight on Foreground -->
+  <path d="M225,465 L245,550 L315,530 Z" fill="#3c1052" opacity="0.5"/>
+  <path d="M405,455 L425,535 L490,520 Z" fill="#3c1052" opacity="0.5"/>
+
+  <!-- Front Silhouette Ridge & Valleys -->
+  <path d="M-20,600 Q60,540 150,580 T330,550 Q420,530 520,575 L520,700 L-20,700 Z" fill="url(#mountFront)"/>
+
+  <!-- Foreground Stylized Pine Trees Silhouettes -->
+  <g fill="#08010d">
+    <!-- Tree cluster left -->
+    <polygon points="25,585 20,625 30,625"/>
+    <polygon points="25,575 16,605 34,605"/>
+    <polygon points="25,565 18,590 32,590"/>
+    <polygon points="25,555 21,575 29,575"/>
+
+    <polygon points="45,595 40,635 50,635"/>
+    <polygon points="45,585 37,615 53,615"/>
+    <polygon points="45,575 39,600 51,600"/>
+    <polygon points="45,565 41,585 49,585"/>
+
+    <polygon points="8,610 3,650 13,650"/>
+    <polygon points="8,600 0,630 16,630"/>
+    <polygon points="8,590 2,615 14,615"/>
+
+    <!-- Tree cluster right -->
+    <polygon points="460,580 454,625 466,625"/>
+    <polygon points="460,570 450,605 470,605"/>
+    <polygon points="460,560 452,590 468,590"/>
+    <polygon points="460,550 455,575 465,575"/>
+
+    <polygon points="480,595 475,640 485,640"/>
+    <polygon points="480,585 471,620 489,620"/>
+    <polygon points="480,575 473,605 487,605"/>
+    <polygon points="480,565 476,590 484,590"/>
+
+    <polygon points="435,615 430,655 440,655"/>
+    <polygon points="435,605 426,635 444,635"/>
+    <polygon points="435,595 428,620 442,620"/>
+  </g>
+
+  <!-- Atmospheric Glow along bottom border -->
+  <rect x="0" y="670" width="500" height="30" fill="#06010a"/>
+</svg>
+

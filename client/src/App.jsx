@@ -2,10 +2,13 @@ import { Layout } from "antd";
 import Sidebar from "./Sidebar/Sidebar";
 import ControlPanel from "./ControlPanel/ControlPanel";
 import ChatArea from "./ChatArea/ChatArea";
+import AuthenticationScreen from "./Auth/AuthenticationScreen";
+import Account from "./ControlPanel/Account/Account";
 import useAppState from "./state";
 import "./App.css";
 
 const { Content } = Layout;
+
 function App() {
 
     // BLOCK 1: APPLICATION STATE
@@ -34,7 +37,16 @@ function App() {
         handleSendMessage
     } = useAppState();
 
-    // BLOCK 2: APPLICATION LAYOUT
+    // BLOCK 2: UNAUTHENTICATED FULL-SCREEN EXPERIENCE
+    if (!user) {
+        return (
+            <AuthenticationScreen>
+                <Account onAuthenticated={handleAuthenticated} />
+            </AuthenticationScreen>
+        );
+    }
+
+    // BLOCK 3: AUTHENTICATED WORKSPACE LAYOUT
     return (
         <div className="app-container">
             <Layout className="workspace-layout">
@@ -71,10 +83,10 @@ function App() {
                 {/* BLOCK 3: RIGHT CONTROL PANEL */}
                 <ControlPanel
                     user={user}
-                    onAuthenticated={handleAuthenticated}
                 />
             </Layout>
         </div>
     );
 }
+
 export default App;

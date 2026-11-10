@@ -9,7 +9,6 @@ import {
     CalendarOutlined,
     ClockCircleOutlined
 } from "@ant-design/icons";
-import Account from "./Account/Account";
 import "./ControlPanel.css";
 
 const { Sider } = Layout;
@@ -55,9 +54,8 @@ function getAccountExpiry(user) {
     return expiryTime;
 }
 
-function ControlPanel({ user = null, onAuthenticated }) {
+function ControlPanel({ user = null }) {
     const [collapsed, setCollapsed] = useState(false);
-    const [activeTab, setActiveTab] = useState("Settings");
 
     // BLOCK 3: ACCOUNT DETAILS
     const accountExpiry = getAccountExpiry(user);
@@ -124,81 +122,47 @@ function ControlPanel({ user = null, onAuthenticated }) {
                     <>
                         {/* BLOCK 2: PANEL NAVIGATION */}
                         <div className="control-panel-navigation">
-
                             <Button
-                                className={`control-panel-tab ${
-                                    activeTab === "Settings" ? "active" : ""
-                                }`}
+                                className="control-panel-tab active"
                                 type="text"
                                 icon={<SettingOutlined />}
-                                onClick={() => setActiveTab("Settings")}
                             >
                                 Settings
                             </Button>
-
-                            <Button
-                                className={`control-panel-tab ${
-                                    activeTab === "Account" ? "active" : ""
-                                }`}
-                                type="text"
-                                icon={<UserOutlined />}
-                                onClick={() => setActiveTab("Account")}
-                            >
-                                Account
-                            </Button>
-
                         </div>
 
                         {/* BLOCK 3: SETTINGS CONTENT */}
-                        {activeTab === "Settings" && (
-                            <div className="control-panel-content">
+                        <div className="control-panel-content">
 
-                                <div className="control-panel-section-heading">
-                                    <SettingOutlined />
-                                    <span>Profile Details</span>
-                                </div>
+                            <div className="control-panel-section-heading">
+                                <SettingOutlined />
+                                <span>Profile Details</span>
+                            </div>
 
-                                <div className="profile-details">
+                            <div className="profile-details">
 
-                                    {profileDetails.map((item) => (
-                                        <div
-                                            className="profile-detail-item"
-                                            key={item.label}
-                                        >
-                                            <div className="profile-detail-label">
-                                                <span className="profile-detail-icon">
-                                                    {item.icon}
-                                                </span>
+                                {profileDetails.map((item) => (
+                                    <div
+                                        className="profile-detail-item"
+                                        key={item.label}
+                                    >
+                                        <div className="profile-detail-label">
+                                            <span className="profile-detail-icon">
+                                                {item.icon}
+                                            </span>
 
-                                                <span>{item.label}</span>
-                                            </div>
-
-                                            <div className="profile-detail-value">
-                                                {item.value}
-                                            </div>
+                                            <span>{item.label}</span>
                                         </div>
-                                    ))}
 
-                                </div>
-
-                            </div>
-                        )}
-
-                        {/* BLOCK 4: ACCOUNT CONTENT */}
-                        {activeTab === "Account" && (
-                            <div className="control-panel-content">
-
-                                <div className="control-panel-section-heading">
-                                    <UserOutlined />
-                                    <span>Account</span>
-                                </div>
-
-                                <Account
-                                    onAuthenticated={onAuthenticated}
-                                />
+                                        <div className="profile-detail-value">
+                                            {item.value}
+                                        </div>
+                                    </div>
+                                ))}
 
                             </div>
-                        )}
+
+                        </div>
                     </>
                 )}
 
