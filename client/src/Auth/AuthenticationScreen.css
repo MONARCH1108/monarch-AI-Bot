@@ -1,95 +1,269 @@
+
 /* =========================================
-   AUTHENTICATION SCREEN — FULLSCREEN WRAPPER
+   BLOCK 1 — FULLSCREEN AUTHENTICATION SCREEN
 ========================================= */
 
 .auth-screen {
+    position: relative;
+    isolation: isolate;
+
     min-height: 100vh;
     min-height: 100dvh;
     width: 100%;
+
     display: flex;
     align-items: center;
     justify-content: center;
+
     padding: clamp(16px, 3.5vw, 40px);
 
-    /* Muted dark lavender / purple-grey ambient background */
+    overflow: hidden;
+
     background:
         radial-gradient(
-            ellipse 80% 60% at 20% 20%,
-            rgba(139, 92, 246, 0.12) 0%,
-            transparent 60%
+            ellipse 75% 65% at 15% 15%,
+            rgba(104, 54, 155, 0.18) 0%,
+            transparent 65%
         ),
         radial-gradient(
-            ellipse 70% 50% at 80% 85%,
-            rgba(183, 133, 255, 0.10) 0%,
-            transparent 55%
+            ellipse 70% 60% at 85% 85%,
+            rgba(123, 70, 180, 0.13) 0%,
+            transparent 65%
         ),
-        linear-gradient(
-            135deg,
-            #585363 0%,
-            #443f4f 50%,
-            #332e3d 100%
+        #09070f;
+}
+
+/* =========================================
+   BLOCK 2 — INTERACTIVE NETWORK BACKGROUND
+========================================= */
+
+.auth-background {
+    position: absolute;
+    inset: 0;
+
+    z-index: 0;
+    overflow: hidden;
+
+    pointer-events: none;
+
+    background:
+        radial-gradient(
+            circle at 50% 50%,
+            rgba(87, 43, 128, 0.10),
+            transparent 65%
+        );
+}
+
+.auth-network-canvas {
+    position: absolute;
+    inset: 0;
+
+    display: block;
+    width: 100%;
+    height: 100%;
+
+    pointer-events: none;
+}
+
+/* Ambient purple light */
+.auth-screen::before {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    z-index: 0;
+    pointer-events: none;
+
+    background:
+        radial-gradient(
+            ellipse 45% 35% at 50% 50%,
+            rgba(123, 70, 180, 0.08),
+            transparent 75%
         );
 }
 
 /* =========================================
-   CENTERED AUTHENTICATION CARD
+   BLOCK 3 — CENTERED AUTHENTICATION CARD
 ========================================= */
 
 .auth-card {
+    position: relative;
+    z-index: 2;
+
     display: grid;
     grid-template-columns: 1fr 1.05fr;
+
     width: min(100%, 920px);
     min-height: 520px;
     max-height: calc(100dvh - 48px);
 
     background: #292432;
+
+    border: 1px solid rgba(195, 143, 255, 0.18);
     border-radius: 22px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
 
     box-shadow:
-        0 24px 80px rgba(0, 0, 0, 0.35),
-        0 4px 20px rgba(20, 10, 30, 0.25),
-        inset 0 1px 1px rgba(255, 255, 255, 0.08);
+        0 24px 80px rgba(0, 0, 0, 0.50),
+        0 0 35px rgba(139, 76, 195, 0.10),
+        inset 0 1px 1px rgba(255, 255, 255, 0.06);
 
     overflow: hidden;
+
+    transition:
+        box-shadow 0.35s ease,
+        border-color 0.35s ease;
+}
+
+.auth-card:hover {
+    border-color: rgba(195, 143, 255, 0.30);
+
+    box-shadow:
+        0 24px 80px rgba(0, 0, 0, 0.50),
+        0 0 45px rgba(139, 76, 195, 0.17),
+        inset 0 1px 1px rgba(255, 255, 255, 0.06);
 }
 
 /* =========================================
-   LEFT ILLUSTRATION PANEL
+   BLOCK 4 — MONARCH BRAND PANEL
 ========================================= */
 
 .auth-illustration-panel {
     position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
     width: 100%;
     height: 100%;
     min-height: 100%;
+
+    padding: 35px;
+
     overflow: hidden;
-    background: #190c29;
+
+    background:
+        radial-gradient(
+            circle at 50% 42%,
+            rgba(139, 76, 195, 0.20),
+            transparent 55%
+        ),
+        linear-gradient(
+            155deg,
+            #160b25 0%,
+            #211033 55%,
+            #12091e 100%
+        );
 }
 
-.auth-illustration-image {
+/* Brand content */
+.auth-brand-content {
+    position: relative;
+    z-index: 2;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
     width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
+    text-align: center;
+}
+
+/* Actual Monarch crown logo */
+.auth-brand-logo {
     display: block;
+
+    width: min(100%, 340px);
+    max-height: 230px;
+
+    object-fit: contain;
+    object-position: center;
+
+    filter:
+        drop-shadow(0 0 18px rgba(191, 132, 255, 0.16));
+
+    transition:
+        transform 0.35s ease,
+        filter 0.35s ease;
+}
+
+.auth-brand-logo:hover {
+    transform: scale(1.035);
+
+    filter:
+        drop-shadow(0 0 28px rgba(191, 132, 255, 0.32));
+}
+
+/* Brand divider */
+.auth-brand-divider {
+    width: 55px;
+    height: 1px;
+
+    margin: 28px 0 18px;
+
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(203, 160, 255, 0.75),
+        transparent
+    );
+}
+
+/* Brand tagline */
+.auth-brand-tagline {
+    margin: 0;
+
+    color: rgba(230, 214, 246, 0.78);
+
+    font-size: 13px;
+    line-height: 1.7;
+    letter-spacing: 0.35px;
+}
+
+/* Soft decorative glow */
+.auth-brand-decoration {
+    position: absolute;
+
+    width: 280px;
+    height: 280px;
+
+    top: 50%;
+    left: 50%;
+
+    transform: translate(-50%, -50%);
+
+    border-radius: 50%;
+
+    background: rgba(139, 76, 195, 0.07);
+    filter: blur(65px);
+
+    pointer-events: none;
 }
 
 /* =========================================
-   RIGHT AUTHENTICATION FORM PANEL
+   BLOCK 5 — RIGHT AUTHENTICATION FORM PANEL
 ========================================= */
 
 .auth-form-panel {
+    position: relative;
+    z-index: 2;
+
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding: clamp(28px, 4vw, 44px) clamp(24px, 4vw, 42px);
+
+    padding: clamp(28px, 4vw, 44px)
+             clamp(24px, 4vw, 42px);
+
     background: #292432;
+
     overflow-y: auto;
     overflow-x: hidden;
 }
 
-/* Custom scrollbar for form panel if needed on small viewports */
+/* Form panel scrollbar */
 .auth-form-panel::-webkit-scrollbar {
     width: 4px;
 }
@@ -104,15 +278,24 @@
 }
 
 /* =========================================
-   RESPONSIVE BREAKPOINTS
+   BLOCK 6 — TABLET RESPONSIVE
 ========================================= */
 
-/* Tablet */
 @media (max-width: 860px) {
     .auth-card {
         grid-template-columns: 0.9fr 1.1fr;
+
         min-height: 480px;
+
         border-radius: 18px;
+    }
+
+    .auth-illustration-panel {
+        padding: 25px;
+    }
+
+    .auth-brand-logo {
+        max-height: 190px;
     }
 
     .auth-form-panel {
@@ -120,7 +303,10 @@
     }
 }
 
-/* Mobile */
+/* =========================================
+   BLOCK 7 — MOBILE RESPONSIVE
+========================================= */
+
 @media (max-width: 680px) {
     .auth-screen {
         padding: 12px;
@@ -128,21 +314,40 @@
 
     .auth-card {
         grid-template-columns: 1fr;
+
         min-height: auto;
         max-height: none;
+
         width: 100%;
+
         border-radius: 16px;
     }
 
     .auth-illustration-panel {
         height: 160px;
         min-height: 160px;
+
+        padding: 12px;
+    }
+
+    .auth-brand-logo {
+        width: 150px;
+        max-height: 100px;
+    }
+
+    .auth-brand-divider,
+    .auth-brand-tagline {
+        display: none;
     }
 
     .auth-form-panel {
         padding: 24px 20px;
     }
 }
+
+/* =========================================
+   BLOCK 8 — SMALL MOBILE
+========================================= */
 
 @media (max-width: 420px) {
     .auth-screen {
@@ -154,8 +359,250 @@
         min-height: 130px;
     }
 
+    .auth-brand-logo {
+        width: 125px;
+        max-height: 90px;
+    }
+
     .auth-form-panel {
         padding: 20px 16px;
     }
 }
 
+/* =========================================
+   BLOCK 9 — REDUCED MOTION
+========================================= */
+
+@media (prefers-reduced-motion: reduce) {
+    .auth-card,
+    .auth-brand-logo {
+        transition: none !important;
+    }
+}
+
+
+/* =========================================
+   BLOCK 10 — DARK MATRIX BRAND PANEL
+========================================= */
+
+/* Darken the brand panel */
+.auth-illustration-panel {
+    isolation: isolate;
+
+    background:
+        radial-gradient(
+            ellipse at 50% 45%,
+            rgba(91, 40, 130, 0.13),
+            transparent 65%
+        ),
+        linear-gradient(
+            145deg,
+            #100819 0%,
+            #190d25 55%,
+            #0c0712 100%
+        ) !important;
+}
+
+/* Subtle matrix grid and vertical data traces */
+.auth-illustration-panel::before {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    z-index: 0;
+    pointer-events: none;
+
+    background:
+        repeating-linear-gradient(
+            90deg,
+            transparent 0,
+            transparent 34px,
+            rgba(174, 113, 224, 0.045) 35px,
+            transparent 36px
+        ),
+        repeating-linear-gradient(
+            0deg,
+            transparent 0,
+            transparent 34px,
+            rgba(174, 113, 224, 0.025) 35px,
+            transparent 36px
+        ),
+        repeating-linear-gradient(
+            180deg,
+            transparent 0%,
+            rgba(168, 102, 220, 0.035) 45%,
+            transparent 50%,
+            rgba(168, 102, 220, 0.025) 55%,
+            transparent 100%
+        );
+
+    background-size:
+        100% 100%,
+        100% 100%,
+        100% 220%;
+
+    opacity: 0.55;
+
+    animation: monarch-matrix-flow 18s linear infinite;
+}
+
+/* Faint vertical scanning light */
+.auth-illustration-panel::after {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    z-index: 1;
+    pointer-events: none;
+
+    background:
+        linear-gradient(
+            180deg,
+            transparent 0%,
+            rgba(171, 105, 224, 0.035) 45%,
+            rgba(171, 105, 224, 0.065) 50%,
+            rgba(171, 105, 224, 0.035) 55%,
+            transparent 100%
+        );
+
+    background-size: 100% 220%;
+
+    opacity: 0.6;
+
+    animation: monarch-matrix-scan 12s linear infinite;
+}
+
+/* Keep logo and tagline above all effects */
+.auth-brand-content {
+    position: relative;
+    z-index: 3;
+}
+
+/* Keep decorative glow very subtle */
+.auth-brand-decoration {
+    z-index: 2;
+    opacity: 0.35;
+}
+
+/* Remove extra hover brightness */
+.auth-card:hover {
+    border-color: rgba(195, 143, 255, 0.18);
+
+    box-shadow:
+        0 24px 80px rgba(0, 0, 0, 0.50),
+        0 0 35px rgba(139, 76, 195, 0.10),
+        inset 0 1px 1px rgba(255, 255, 255, 0.06);
+}
+
+.auth-brand-logo:hover {
+    transform: none;
+
+    filter:
+        drop-shadow(0 0 18px rgba(191, 132, 255, 0.16));
+}
+
+/* Matrix animation */
+@keyframes monarch-matrix-flow {
+    from {
+        background-position: 0 0, 0 0, 0 0;
+    }
+
+    to {
+        background-position: 0 0, 0 0, 0 220%;
+    }
+}
+
+@keyframes monarch-matrix-scan {
+    from {
+        background-position: 0 -220%;
+    }
+
+    to {
+        background-position: 0 220%;
+    }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+    .auth-illustration-panel::before,
+    .auth-illustration-panel::after {
+        animation: none !important;
+    }
+}
+
+
+/* =========================================
+   BLOCK 11 — PURE BLACK MATRIX BRAND THEME
+========================================= */
+
+/* Pure black brand panel */
+.auth-illustration-panel {
+    background: #050505 !important;
+}
+
+/* Monochrome matrix grid */
+.auth-illustration-panel::before {
+    background:
+        repeating-linear-gradient(
+            90deg,
+            transparent 0,
+            transparent 34px,
+            rgba(255, 255, 255, 0.025) 35px,
+            transparent 36px
+        ),
+        repeating-linear-gradient(
+            0deg,
+            transparent 0,
+            transparent 34px,
+            rgba(255, 255, 255, 0.015) 35px,
+            transparent 36px
+        ),
+        repeating-linear-gradient(
+            180deg,
+            transparent 0%,
+            rgba(255, 255, 255, 0.025) 45%,
+            transparent 50%,
+            rgba(255, 255, 255, 0.015) 55%,
+            transparent 100%
+        );
+
+    background-size:
+        100% 100%,
+        100% 100%,
+        100% 220%;
+
+    opacity: 0.45;
+}
+
+/* Subtle monochrome scanning light */
+.auth-illustration-panel::after {
+    background: linear-gradient(
+        180deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.015) 45%,
+        rgba(255, 255, 255, 0.045) 50%,
+        rgba(255, 255, 255, 0.015) 55%,
+        transparent 100%
+    );
+
+    background-size: 100% 220%;
+    opacity: 0.45;
+}
+
+/* Remove purple ambient decoration */
+.auth-brand-decoration {
+    background: rgba(255, 255, 255, 0.025);
+    opacity: 0.25;
+}
+
+/* Neutral white logo shadow */
+.auth-brand-logo {
+    filter: drop-shadow(0 0 14px rgba(255, 255, 255, 0.08));
+}
+
+/* Preserve the neutral logo appearance on hover */
+.auth-brand-logo:hover {
+    filter: drop-shadow(0 0 14px rgba(255, 255, 255, 0.08));
+}
