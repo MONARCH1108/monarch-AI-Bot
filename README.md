@@ -46,8 +46,6 @@ To provide a lightweight, privacy-focused, and seamlessly deployable AI assistan
 | **Frontend** | Conversation switching and "New Chat" thread initiation | ✅ Implemented |
 | **Frontend** | User profile panel with calculated 24-hour expiry and logout | ✅ Implemented |
 | **Full Stack** | Streaming LLM responses (SSE / WebSockets) | ❌ Roadmap |
-| **Full Stack** | Automatic conversation title generation | ❌ Roadmap |
-| **Full Stack** | Automated background database pruning cron jobs | ❌ Roadmap |
 
 ---
 
