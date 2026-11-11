@@ -101,18 +101,21 @@ To provide a lightweight, privacy-focused, and seamlessly deployable AI assistan
 ## 7. Combined Architecture Overview
 
 ```mermaid
+
 flowchart TB
-    subgraph Browser["User Browser (Client)"]
-        UI["React 19 SPA (Vite)"]
+    subgraph Browser["User Browser - Client"]
+        UI["React 19 SPA - Vite"]
         State["useAppState Hook"]
         Storage[("localStorage")]
+
         UI <--> State
         State <--> Storage
     end
 
     subgraph Cloud["Render Cloud Platform"]
-        Docker["Docker Container (Port 8000)"]
-        FastAPI["FastAPI App (main.py)"]
+        Docker["Docker Container - Port 8000"]
+        FastAPI["FastAPI Application - main.py"]
+
         Docker --> FastAPI
     end
 
@@ -121,14 +124,15 @@ flowchart TB
         GroqAPI["Groq Cloud LLM API"]
     end
 
-    Browser -->|1. Public: GET /health| FastAPI
-    Browser -->|2. Basic Auth: POST /token| FastAPI
-    Browser -->|3. Bearer JWT Requests| FastAPI
+    Browser -->|"1. Public Health Check"| FastAPI
+    Browser -->|"2. Basic Auth Token Request"| FastAPI
+    Browser -->|"3. Bearer JWT Requests"| FastAPI
 
-    FastAPI -->|Token Validation & Revocation| NeonDB
-    FastAPI -->|User Signup & Login (24h Window)| NeonDB
-    FastAPI -->|Store & Fetch Conversations/Messages| NeonDB
-    FastAPI -->|Model Discovery & Chat Completions| GroqAPI
+    FastAPI -->|"Token Validation and Revocation"| NeonDB
+    FastAPI -->|"User Signup and Login - 24 Hour Session"| NeonDB
+    FastAPI -->|"Store and Fetch Conversations and Messages"| NeonDB
+    FastAPI -->|"Model Discovery and Chat Completions"| GroqAPI
+
 ```
 
 ---
